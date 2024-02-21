@@ -9,14 +9,14 @@ using boost::asio::ip::tcp;
 class ClientSession : public std::enable_shared_from_this<ClientSession> {
 private:
   tcp::socket m_socket;
-  std::vector<char> m_buffer;
+  std::array<char, 1024> m_buffer;
 
   void readRequest();
   void sendResponse();
 
 public:
   explicit ClientSession(tcp::socket socket);
-  void run();
+  void startService();
 };
 
 // The proxy server listens for incoming client connections
