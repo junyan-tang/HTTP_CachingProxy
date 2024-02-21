@@ -1,92 +1,52 @@
 #include "proxy.hpp"
 
-using namespace std;
+ClientSession::ClientSession(tcp::socket socket)
+    : m_socket(std::move(socket)) {}
 
-int Proxy::createServerSocket(){
-  int status;
-  int socket_fd;
-  struct addrinfo host_info;
-  struct addrinfo *host_info_list;
-  
-  memset(&host_info, 0, sizeof(host_info));
-  host_info.ai_family   = AF_UNSPEC;
-  host_info.ai_socktype = SOCK_STREAM;
-  host_info.ai_flags    = AI_PASSIVE;
+void ClientSession::run() { readRequest(); }
 
-  status = getaddrinfo(hostname, port, &host_info, &host_info_list);
-  if (status != 0) {
-    cerr << "Error: cannot get address info for host" << endl;
-    cerr << "  (" << hostname << "," << port << ")" << endl;
-  }
-
-  socket_fd = socket(host_info_list->ai_family, host_info_list->ai_socktype, 
-		     host_info_list->ai_protocol);
-  if (socket_fd == -1) {
-    cerr << "Error: cannot create socket" << endl;
-    cerr << "  (" << hostname << "," << port << ")" << endl;
-  }
-  int yes = 1;
-  status = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-  status = bind(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
-  if (status == -1) {
-    cerr << "Error: cannot bind socket" << endl;
-    cerr << "  (" << hostname << "," << port << ")" << endl;
-  } 
-  freeaddrinfo(host_info_list);
-  return socket_fd;
+// Asynchronously read data from the client
+void ClientSession::readRequest() {
+  auto self(shared_from_this());
+  m_socket.async_read_some(
+      boost::asio::buffer(m_buffer),
+      [this, self](boost::system::error_code ec, std::size_t length) {
+        if (!ec) {
+          // Placeholder for request processing logic
+          std::cout << "Request: " << std::string(m_buffer.data(), length)
+                    << std::endl;
+          // Simply echo the request back
+          sendResponse();
+        }
+      });
 }
 
-int Proxy::accpetClientConnection(int socket_fd){
-  int status = listen(socket_fd, 100);
-  if (status == -1) {
-    cerr << "Error: cannot listen on socket" << endl; 
-  } 
-
-  struct sockaddr_storage socket_addr;
-  socklen_t socket_addr_len = sizeof(socket_addr);
-  int client_connection_fd;
-  client_connection_fd = accept(socket_fd, (struct sockaddr *)&socket_addr, &socket_addr_len);
-  if (client_connection_fd == -1) {
-    cerr << "Error: cannot accept connection on socket" << endl;
-    return -1;
-  } 
-  return client_connection_fd;
+// Asynchronously send data back to the client
+void ClientSession::sendResponse() {
+  auto self(shared_from_this());
+  boost::asio::async_write(
+      m_socket, boost::asio::buffer(m_buffer),
+      [this, self](boost::system::error_code ec, std::size_t length) {
+        if (!ec) {
+          // Read the next request
+          readRequest();
+        }
+      });
 }
 
-
-int Proxy::createClientSocket(char *hostname){
-  int status;
-  int socket_fd;
-  struct addrinfo host_info;
-  struct addrinfo *host_info_list;
-
-  memset(&host_info, 0, sizeof(host_info));
-  host_info.ai_family   = AF_UNSPEC;
-  host_info.ai_socktype = SOCK_STREAM;
-
-  status = getaddrinfo(hostname, port, &host_info, &host_info_list);
-  if (status != 0) {
-    cerr << "Error: cannot get address info for host" << endl;
-    return -1;
-  }
-
-  socket_fd = socket(host_info_list->ai_family, host_info_list->ai_socktype, 
-		     host_info_list->ai_protocol);
-  if (socket_fd == -1) {
-    cerr << "Error: cannot create socket" << endl;
-    return -1;
-  }
-  status = connect(socket_fd, host_info_list->ai_addr, host_info_list->ai_addrlen);
-  if (status == -1) {
-    cerr << "Error: cannot connect to socket" << endl;
-    return -1;
-  }
-
+ProxyServer::ProxyServer(boost::asio::io_context &ioContext, short port)
+    : m_acceptor(ioContext, tcp::endpoint(tcp::v4(), port)) {
+  acceptConnection();
 }
 
-
-int main(int argc, char *argv[])
-{  
-  // send(socket_fd, message, strlen(message), 0);
-  // close(socket_fd);
+// Asynchronously accept incoming connections
+void ProxyServer::acceptConnection() {
+  m_acceptor.async_accept([this](boost::system::error_code ec, tcp::socket socket) {
+    if (!ec) {
+      // Create a session for each connection
+      std::make_shared<ClientSession>(std::move(socket))->run();
+    }
+    // Wait for another connection
+    acceptConnection();
+  });
 }

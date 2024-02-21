@@ -1,22 +1,31 @@
+#include <boost/asio.hpp>
 #include <iostream>
-#include <cstring>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <unistd.h>
+#include <memory>
+#include <vector>
 
-class Proxy{
-protected:
-    const char *hostname;
-    const char *port;
+using boost::asio::ip::tcp;
+
+// A session represents a single connection from a client
+class ClientSession : public std::enable_shared_from_this<ClientSession> {
+private:
+  tcp::socket m_socket;
+  std::vector<char> m_buffer;
+
+  void readRequest();
+  void sendResponse();
+
 public:
-    Proxy():hostname(NULL), port("12345"){}
-    Proxy(char *hostname):hostname(hostname), port(NULL){}
+  explicit ClientSession(tcp::socket socket);
+  void run();
+};
 
-    void processGET();
-    void processCONNECT();
-    void processPOST();
-    void cacheResponse();
-    int createServerSocket();
-    int accpetClientConnection(int socket_fd);
-    int createClientSocket(char *hostname);
+// The proxy server listens for incoming client connections
+class ProxyServer {
+private:
+  tcp::acceptor m_acceptor;
+
+  void acceptConnection();
+
+public:
+  ProxyServer(boost::asio::io_service &ioContext, short port);
 };
