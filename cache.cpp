@@ -4,12 +4,12 @@
 void Cache::printToLog() {}
 
 void Cache::removeFromCache() {
-  string url = cacheQueue.front();
+  std::string url = cacheQueue.front();
   cacheBase.erase(url);
   cacheQueue.pop();
 }
 
-void Cache::addToCache(string &url,
+void Cache::addToCache(std::string &url,
                        http::response<http::string_body> &response) {
   if (!isInCache(url)) {
     if (isCacheFull()) {
@@ -30,14 +30,14 @@ bool Cache::isCacheFull() {
   return false;
 }
 
-bool Cache::isInCache(string &url) {
+bool Cache::isInCache(std::string &url) {
   if (cacheBase.find(url) == cacheBase.end()) {
     return false;
   }
   return true;
 }
 
-http::response<http::string_body> Cache::getCachedPage(string &url) {
+http::response<http::string_body> Cache::getCachedPage(std::string &url) {
   http::response<http::string_body> res = cacheBase[url];
   return res;
 }

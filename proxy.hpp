@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 
+#include "request.hpp"
+
 using boost::asio::ip::tcp;
 namespace http = boost::beast::http;
 
@@ -23,10 +25,15 @@ private:
 
   void readRequest();
   void sendResponse();
+  void processGET(Request& req);
+  void processPOST(Request& req);
+  void processCONNECT(Request& req);
 
 public:
   explicit ClientSession(tcp::socket socket);
   void startService();
+  typedef void (ClientSession::*RequestHandler)(Request&);
+  static RequestHandler getHandler(const std::string_view& requestType);
 };
 
 // The proxy server listens for incoming client connections
@@ -34,9 +41,6 @@ class ProxyServer {
 private:
   tcp::acceptor m_acceptor;
   void acceptConnection();
-  void processGET();
-  void processPOST();
-  void processCONNECT();
 
 public:
   ProxyServer(boost::asio::io_service &ioContext, short port);

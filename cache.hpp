@@ -6,22 +6,21 @@
 #include <queue>
 #include <string>
 
-using namespace std;
 namespace http = boost::beast::http;
 class Cache {
 protected:
   size_t cacheCapacity;
-  map<string, http::response<http::string_body>> cacheBase;
-  queue<string> cacheQueue;
+  std::map<std::string, http::response<http::string_body>> cacheBase;
+  std::queue<std::string> cacheQueue;
 
 public:
   Cache(size_t cap) : cacheCapacity(cap) {}
-  void addToCache(string &url, http::response<http::string_body> &response);
+  void addToCache(std::string &url, http::response<http::string_body> &response);
   void removeFromCache();
   bool isCacheFull();
-  bool isInCache(string &url);
+  bool isInCache(std::string &url);
   void printToLog();
-  http::response<http::string_body> getCachedPage(string &url);
+  http::response<http::string_body> getCachedPage(std::string &url);
 };
 
 #endif
