@@ -6,14 +6,17 @@ void Cache::printToLog(){
 }
 
 void Cache::removeFromCache(){
-
+    string url = cacheQueue.front();
+    cacheBase.erase(url);
+    cacheQueue.pop();
 }
 
-void Cache::addToCache(string &url, response<string_body> &response){
+void Cache::addToCache(string &url, http::response<http::string_body> &response){
     if(!isInCache(url)){
         if(isCacheFull()){
-
+            removeFromCache();
         }
+        cacheBase[url] = response;
         cacheQueue.push(url);
     }
     else{
@@ -36,7 +39,7 @@ bool Cache::isInCache(string &url){
     return true;
 }
 
-response<string_body> * Cache::getCachedPage(string &url){
-    response<string_body> * res = &cacheBase[url];
+http::response<http::string_body> & Cache::getCachedPage(string &url){
+    http::response<http::string_body>  res = cacheBase[url];
     return res;
 }

@@ -34,8 +34,10 @@ public:
 class ProxyServer {
 private:
   tcp::acceptor m_acceptor;
-
   void acceptConnection();
+  void processGET();
+  void processPOST();
+  void processCONNECT();
 
 public:
   ProxyServer(boost::asio::io_service &ioContext, short port);
