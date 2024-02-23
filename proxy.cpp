@@ -36,7 +36,12 @@ void ClientSession::processCONNECT(Request &req) {
           m_response.result(http::status::ok);
           m_response.set(http::field::connection, "keep-alive");
           sendResponse();
-          // TODO: Do we need tunneling?
+          // TODO: Do we need tunneling here?
+          // If tunneling is required, no need to care about other types of
+          // requests, just forwarding? Otherwise, we need to handle other types
+          // of requests, and we should remember the connection (socket) to the
+          // target host, which may use std::unordered_map to record the
+          // mapping.
         } else {
           // connect failed
           m_response.result(http::status::bad_gateway);
