@@ -1,6 +1,9 @@
 #include "proxy.hpp"
+#include "log.hpp"
+#include "request.hpp"
 #include <iostream>
 
+namespace http = boost::beast::http;
 ClientSession::ClientSession(tcp::socket socket)
     : m_socket(std::move(socket)) {}
 
@@ -9,13 +12,13 @@ void ClientSession::startService() { readRequest(); }
 // Asynchronously read data from the client
 void ClientSession::readRequest() {
   auto self(shared_from_this());
-  m_socket.async_read_some(
-      boost::asio::buffer(m_buffer),
+  
+  http::async_read(m_socket, m_buffer, m_request,
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
           // Placeholder for request processing logic
           if (length > 0) {
-            std::cout << "Request: " << std::string(m_buffer.data(), length)
+            std::cout << "Request Method: " << m_request.method_string()
                       << std::endl;
           }
           // Simply echo the request back
@@ -27,9 +30,9 @@ void ClientSession::readRequest() {
 // Asynchronously send data back to the client
 void ClientSession::sendResponse() {
   auto self(shared_from_this());
-  boost::asio::async_write(
-      m_socket, boost::asio::buffer(m_buffer),
-      [this, self](boost::system::error_code ec, std::size_t length) {
+  http::async_write(
+      m_socket, m_response,
+      [this, self](boost::system::error_code ec, std::size_t length) mutable{
         if (!ec) {
           // Read the next request
           // std::cout << "Response sent" << std::endl;

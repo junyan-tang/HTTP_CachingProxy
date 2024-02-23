@@ -1,0 +1,1 @@
+g++ -o server proxy.cpp -lpthread
