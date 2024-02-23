@@ -1,1 +1,28 @@
-g++ -o server proxy.cpp -lpthread
+# Compiler
+CXX = g++
+
+# Compiler flags
+CXXFLAGS = -Wall -std=c++17
+
+# Boost libraries
+LIBS = -lboost_system -lpthread
+
+# Source files
+SRCS = service.cpp proxy.cpp cache.cpp
+
+# Object files
+OBJS = $(SRCS:.cpp=.o)
+
+# Executable name
+EXEC = server
+
+all: $(EXEC)
+
+$(EXEC): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $(EXEC) $(OBJS) $(LIBS)
+
+.cpp.o:
+	$(CXX) $(CXXFLAGS) -c $<  -o $@
+
+clean:
+	$(RM) $(OBJS) $(EXEC)

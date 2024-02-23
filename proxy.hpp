@@ -1,10 +1,9 @@
-#ifndef PROXY_HPP 
-#define PROXY_HPP
+#ifndef __PROXY_HPP__
+#define __PROXY_HPP__
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 #include <iostream>
-#include <memory>
 #include <vector>
 
 using boost::asio::ip::tcp;

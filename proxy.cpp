@@ -16,7 +16,8 @@ void ClientSession::startService() { readRequest(); }
 // Asynchronously read data from the client
 void ClientSession::readRequest() {
   auto self(shared_from_this());
-  http::async_read(m_socket, m_buffer, m_request,
+  http::async_read(
+      m_socket, m_buffer, m_request,
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
           // Placeholder for request processing logic
@@ -34,8 +35,9 @@ void ClientSession::readRequest() {
 // Asynchronously send data back to the client
 void ClientSession::sendResponse() {
   auto self(shared_from_this());
-  http::async_write(m_socket, m_response,
-      [this, self](boost::system::error_code ec, std::size_t length) mutable{
+  http::async_write(
+      m_socket, m_response,
+      [this, self](boost::system::error_code ec, std::size_t length) mutable {
         if (!ec) {
           // Read the next request
           // std::cout << "Response sent" << std::endl;
@@ -62,19 +64,4 @@ void ProxyServer::acceptConnection() {
       });
 }
 
-void ProxyServer::processGET() {
-  
-}
-
-int main() {
-  try {
-    boost::asio::io_context ioContext;
-    ProxyServer server(ioContext, 12345);
-
-    ioContext.run();
-  } catch (std::exception &e) {
-    std::cerr << "Exception: " << e.what() << "\n";
-  }
-
-  return 0;
-}
+void ProxyServer::processGET() {}
