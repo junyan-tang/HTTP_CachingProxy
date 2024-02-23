@@ -10,6 +10,10 @@
 using boost::asio::ip::tcp;
 namespace http = boost::beast::http;
 
+// The basic implementation of proxy server and client session referenced from
+// the examples from asio section in official boost documentation
+// https://beta.boost.org/doc/libs/1_82_0/doc/html/boost_asio/example/cpp11/echo/async_tcp_echo_server.cpp
+
 // A session represents a single connection from a client
 class ClientSession : public std::enable_shared_from_this<ClientSession> {
 private:

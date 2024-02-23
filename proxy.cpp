@@ -3,6 +3,10 @@
 #include "request.hpp"
 #include <iostream>
 
+// The basic implementation of proxy server and client session referenced from
+// the examples from asio section in official boost documentation
+// https://beta.boost.org/doc/libs/1_82_0/doc/html/boost_asio/example/cpp11/echo/async_tcp_echo_server.cpp
+
 namespace http = boost::beast::http;
 ClientSession::ClientSession(tcp::socket socket)
     : m_socket(std::move(socket)) {}
