@@ -1,7 +1,42 @@
 #include "cache.hpp"
 #include "log.hpp"
 
-void Cache::printToLog() {}
+bool compareExpireTime(std::string expire_time){
+    if(expire_time == ""){
+      return false;
+    }
+    std::tm tm = {};
+    std::istringstream ss(expire_time);
+    ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+
+    auto expireTime = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    auto now = std::chrono::system_clock::now();
+    return (now > expireTime) ? true: false;
+}
+
+bool Cache::checkValidation(std::string &url, int req_id){
+  if(!isInCache(url)){
+    logFile << req_id << ": not in cache" << std::endl;
+    return false;
+  }
+  else{
+    Response resp = cacheBase[url];
+    if(compareExpireTime(resp.checkExpireTime())){
+      logFile << req_id << ": in cache, but expired at " << resp.checkExpireTime() << std::endl;
+      return false;
+    }
+    //check validation place holder
+    else if(false){
+      logFile << req_id << ": in cache, requires validation" << std::endl;
+      return false;
+    }
+    else{
+      logFile << req_id << ": in cache, valid" << std::endl;
+      return true;
+    }
+  }
+  
+}
 
 void Cache::removeFromCache() {
   std::string url = cacheQueue.front();
@@ -10,16 +45,11 @@ void Cache::removeFromCache() {
 }
 
 void Cache::addToCache(std::string &url,
-                       http::response<http::string_body> &response) {
-  if (!isInCache(url)) {
-    if (isCacheFull()) {
-      removeFromCache();
-    }
-    cacheBase[url] = response;
-    cacheQueue.push(url);
-  } else {
-    // handle cache
+                       Response &response) {
+  if (isCacheFull()) {
+    removeFromCache();
   }
+  cacheQueue.push(url);
   cacheBase[url] = response;
 }
 
@@ -38,6 +68,6 @@ bool Cache::isInCache(std::string &url) {
 }
 
 http::response<http::string_body> Cache::getCachedPage(std::string &url) {
-  http::response<http::string_body> res = cacheBase[url];
-  return res;
+  Response res = cacheBase[url];
+  return res.getResponse();
 }

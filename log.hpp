@@ -1,4 +1,5 @@
 #include <fstream>
 #include <iostream>
 
-extern std::ofstream logFile;
+//path: /var/log/erss/proxy.log
+extern std::ofstream logFile("./log.txt", std::ios::app);

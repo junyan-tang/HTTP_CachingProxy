@@ -23,12 +23,23 @@ public:
       : res(m_res),
         status_code(res.result_int()),
         headers(res.base()),
-        body(res.body()) {}
+        body(res.body()){}
 
   int getStatusCode() { return status_code; }
   http::fields getHeaders() { return headers; }
   std::string getBody() { return body; }
   http::response<http::string_body> getResponse() { return res; }
+  std::string checkExpireTime(){
+    std::string expire_time;
+    auto it = res.find(http::field::expires);
+    if(it != res.end()){
+      expire_time = it->value().to_string();
+    }
+    else{
+      expire_time = "";
+    }
+    return expire_time;
+  }
 };
 
 #endif

@@ -18,6 +18,7 @@ protected:
   std::string_view target;
   int version;
   http::fields headers;
+  int id;
 
 public:
   Request(http::request<http::string_body> &m_req)
@@ -32,6 +33,7 @@ public:
   std::string getTargetPort() { return std::string(target.substr(target.find(':') + 1)); }
   int getVersion() { return version; }
   http::fields getHeaders() { return headers; }
+  int getID() { return id; }
   http::request<http::string_body> getRequest() { return req; }
 };
 

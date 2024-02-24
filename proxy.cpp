@@ -9,8 +9,39 @@
 
 namespace http = boost::beast::http;
 
-void ClientSession::processGET(Request &req) {}
-void ClientSession::processPOST(Request &req) {}
+void ClientSession::processGET(Request &req) {
+  //check if it in cache and can be use
+  return;
+  //else request to the original server
+  //ID: Requesting "REQUEST" from SERVER
+  //ID: Received "RESPONSE" from SERVER
+
+  //if receive 200-ok
+  if(false){
+    // not cacheable
+    if(false){
+      //add reason
+      logFile << req.getID() << ": not cacheable because " << "reason holder" << std::endl;
+    }
+    else{
+      //add to cache
+      // if need revalidation
+      if(false){
+        logFile << req.getID() << ": cached, but requires re-validation" << std::endl;
+      }
+      // if it has expire time
+      else if(false){
+        logFile << req.getID() << ": cached, expires at " << time << std::endl;
+      }
+    }
+
+  }
+}
+void ClientSession::processPOST(Request &req) {
+  //directly forward to original server
+  //ID: Requesting "REQUEST" from SERVER
+  //ID: Received "RESPONSE" from SERVER
+}
 
 void ClientSession::processCONNECT(Request &req) {
   std::string host = req.getTargetHost();
@@ -52,6 +83,9 @@ void ClientSession::processCONNECT(Request &req) {
 
 ClientSession::RequestHandler
 ClientSession::getHandler(const std::string_view &requestType) {
+ //assign it a unique id (ID), and print the ID, time received (TIME), IP address the request was received from (IPFROM) and the
+ //HTTP request line (REQUEST) of the request in the following format:
+ //ID: "REQUEST" from IPFROM @ TIME
   if (requestType == "GET") {
     return &ClientSession::processGET;
   } else if (requestType == "POST") {
@@ -60,6 +94,7 @@ ClientSession::getHandler(const std::string_view &requestType) {
     return &ClientSession::processCONNECT;
   } else {
     // Handle unknown request type
+    // ID: Responding "RESPONSE" receive a malformed request
     return nullptr;
   }
 }
