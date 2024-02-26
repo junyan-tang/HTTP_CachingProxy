@@ -40,7 +40,7 @@ public:
   void startService();
   typedef void (ClientSession::*RequestHandler)(Request&);
   static RequestHandler getHandler(const std::string_view& requestType);
-  size_t getID() const;
+  //size_t getID() const;
 };
 
 // The proxy server listens for incoming client connections

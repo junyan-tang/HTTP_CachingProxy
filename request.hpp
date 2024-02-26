@@ -16,37 +16,9 @@ protected:
   http::request<http::string_body> req;
   std::string_view requestType;
   std::string_view target;
-  int version;
   http::fields headers;
   int id;
-
-  std::pair<std::string, std::string> parse_url(const std::string &url) {
-    std::regex url_pattern(
-        R"(^(http:\/\/|https:\/\/)?([^\/:]+)(:\d+)?(\/.*)?$)");
-    std::smatch url_match_result;
-
-    std::string host = "";
-    std::string port = "";
-
-    if (std::regex_match(url, url_match_result, url_pattern)) {
-      // Extract host
-      if (url_match_result[2].matched) {
-        host = url_match_result[2];
-      }
-      // Extract port (if specified)
-      if (url_match_result[3].matched) {
-        port = url_match_result[3].str().substr(1); // Remove the leading colon
-      } else if (url_match_result[1].matched) {
-        // Assign default port based on the scheme
-        std::string scheme = url_match_result[1].str();
-        port = (scheme == "http://")    ? "80"
-               : (scheme == "https://") ? "443"
-                                        : "";
-      }
-    }
-
-    return {host, port};
-  }
+  int version;
 
 public:
   Request(http::request<http::string_body> &m_req)
@@ -59,18 +31,33 @@ public:
   std::string_view getRequestType() { return requestType; }
   std::string_view getTarget() { return target; }
   std::string getTargetHost() {
-    auto [host, _] =
-        parse_url(std::string(target)); // Using structured binding to extract only the host
-    return host;
+    std::string host = req["Host"].to_string();
+    auto pos = host.find(':');
+    if (pos != std::string::npos) {
+        return host.substr(0, pos);
+    } else {
+        return host;
+    }
   }
   std::string getTargetPort() {
-    auto [_, port] =
-        parse_url(std::string(target)); // Using structured binding to extract only the port
-    return port;
+    std::string port;
+    if(requestType == "CONNECT"){
+      port = "443";
+    }
+    else{
+      port = "80";
+    }
+    std::string host = req["Host"].to_string();
+    auto pos = host.find(':');
+    if (pos != std::string::npos) {
+        return host.substr(pos + 1);
+    } else {
+        return port;
+    }
   }
   int getVersion() { return version; }
-  http::fields getHeaders() { return headers; }
   int getID() { return id; }
+  http::fields getHeaders() { return headers; }
   http::request<http::string_body> getRequest() { return req; }
 };
 
