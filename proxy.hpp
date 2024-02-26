@@ -50,7 +50,7 @@ private:
   void acceptConnection();
 
 public:
-  ProxyServer(boost::asio::io_service &ioContext, short port);
+  ProxyServer(boost::asio::io_context &ioContext, short port);
 };
 
 #endif

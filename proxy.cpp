@@ -1,4 +1,5 @@
 #include "proxy.hpp"
+#include "cache.hpp"
 // #include "log.hpp"
 #include "request.hpp"
 #include <boost/beast/http/read.hpp>
@@ -11,6 +12,8 @@
 namespace http = boost::beast::http;
 
 static size_t session_id = 0;
+static int request_id = 0;
+Cache cache(100);
 
 void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                               boost::beast::flat_buffer &buffer) {
@@ -52,12 +55,17 @@ void ClientSession::startForwarding() {
 }
 
 void ClientSession::processGET(Request &req) {
+  // std::string_view uri = req.getTarget();
   // // check if it in cache and can be use
-  // return;
-  // // else request to the original server
-  // // ID: Requesting "REQUEST" from SERVER
-  // // ID: Received "RESPONSE" from SERVER
-
+  // if (cache.isCacheUsable(uri, req.getID())){
+  //   http::response<http::string_body> resp = cache.getCachedPage(uri);
+  // }
+  // else{
+  //   logFile << req.getID() << ": Requesting " << req << " from " << << std::endl;
+  //   //send to original server and recieve
+  //   logFile << req.getID() << ": Received " << resp << " from " << << std::endl;
+  // }
+  
   // // if receive 200-ok
   // if (false) {
   //   // not cacheable
@@ -83,9 +91,9 @@ void ClientSession::processGET(Request &req) {
 }
 
 void ClientSession::processPOST(Request &req) {
-  // directly forward to original server
-  // ID: Requesting "REQUEST" from SERVER
+  // directly forward to original servers
   // ID: Received "RESPONSE" from SERVER
+  //logFile << req.getID() << ": Requesting " << req << " from " << << std::endl;
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
   std::cout << "Host: " << host << " Port: " << port << std::endl;
@@ -219,6 +227,7 @@ void ClientSession::sendResponse() {
         if (!ec) {
           // Read the next request
           // std::cout << "Response sent" << std::endl;
+          std::cout << m_response << std::endl;
           m_response.clear();
           readRequest();
         }

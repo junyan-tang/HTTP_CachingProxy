@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string_view>
+#include <regex>
 
 namespace http = boost::beast::http;
 using namespace boost::asio;
@@ -29,17 +30,6 @@ public:
   http::fields getHeaders() { return headers; }
   std::string getBody() { return body; }
   http::response<http::string_body> getResponse() { return res; }
-  std::string checkExpireTime(){
-    std::string expire_time;
-    auto it = res.find(http::field::expires);
-    if(it != res.end()){
-      expire_time = it->value().to_string();
-    }
-    else{
-      expire_time = "";
-    }
-    return expire_time;
-  }
 };
 
 #endif
