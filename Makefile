@@ -2,16 +2,19 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -Wall -std=c++17
+CXXFLAGS = -Wall -std=c++17 -MMD -MP
 
 # Boost libraries
 LIBS = -lboost_system -lpthread
 
 # Source files
-SRCS = service.cpp proxy.cpp cache.cpp
+SRCS = service.cpp proxy.cpp # cache.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)
+
+# Dependency files
+DEPS = $(OBJS:.o=.d)
 
 # Executable name
 EXEC = server
@@ -25,4 +28,6 @@ $(EXEC): $(OBJS)
 	$(CXX) $(CXXFLAGS) -c $<  -o $@
 
 clean:
-	$(RM) $(OBJS) $(EXEC)
+	$(RM) $(OBJS) $(EXEC) $(DEPS)
+
+-include $(DEPS)

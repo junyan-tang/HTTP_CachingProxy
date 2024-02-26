@@ -1,6 +1,7 @@
 #include "proxy.hpp"
-#include "log.hpp"
+// #include "log.hpp"
 #include "request.hpp"
+#include <boost/beast/http/read.hpp>
 #include <iostream>
 
 // The basic implementation of proxy server and client session referenced from
@@ -9,38 +10,115 @@
 
 namespace http = boost::beast::http;
 
-void ClientSession::processGET(Request &req) {
-  //check if it in cache and can be use
-  return;
-  //else request to the original server
-  //ID: Requesting "REQUEST" from SERVER
-  //ID: Received "RESPONSE" from SERVER
+static size_t session_id = 0;
 
-  //if receive 200-ok
-  if(false){
-    // not cacheable
-    if(false){
-      //add reason
-      logFile << req.getID() << ": not cacheable because " << "reason holder" << std::endl;
-    }
-    else{
-      //add to cache
-      // if need revalidation
-      if(false){
-        logFile << req.getID() << ": cached, but requires re-validation" << std::endl;
-      }
-      // if it has expire time
-      else if(false){
-        logFile << req.getID() << ": cached, expires at " << time << std::endl;
-      }
-    }
-
-  }
+void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
+                              boost::beast::flat_buffer &buffer) {
+  auto self(shared_from_this());
+  std::cout << "Forwarding data" << std::endl;
+  source.async_read_some(
+      buffer.prepare(4096), // Adjust the size as needed
+      [this, self, &source, &target, &buffer](boost::system::error_code ec,
+                                              std::size_t bytes_transferred) {
+        if (!ec) {
+          buffer.commit(bytes_transferred);
+          boost::asio::async_write(
+              target, buffer.data(),
+              [this, self, &source, &target,
+               &buffer](boost::system::error_code ec, std::size_t length) {
+                if (!ec) {
+                  buffer.consume(
+                      buffer.size()); // Clear the buffer after writing
+                  doForward(source, target,
+                            buffer); // Continue the forwarding loop
+                } else {
+                  // Handle write error or close connection
+                  source.close();
+                  target.close();
+                }
+              });
+        } else {
+          // Handle read error or close connection
+          source.close();
+          target.close();
+        }
+      });
 }
+
+void ClientSession::startForwarding() {
+  auto self(shared_from_this());
+  doForward(m_socket, m_target_socket, m_buffer_client);
+  doForward(m_target_socket, m_socket, m_buffer_target);
+}
+
+void ClientSession::processGET(Request &req) {
+  // // check if it in cache and can be use
+  // return;
+  // // else request to the original server
+  // // ID: Requesting "REQUEST" from SERVER
+  // // ID: Received "RESPONSE" from SERVER
+
+  // // if receive 200-ok
+  // if (false) {
+  //   // not cacheable
+  //   if (false) {
+  //     // add reason
+  //     logFile << req.getID() << ": not cacheable because "
+  //             << "reason holder" << std::endl;
+  //   } else {
+  //     // add to cache
+  //     //  if need revalidation
+  //     if (false) {
+  //       logFile << req.getID() << ": cached, but requires re-validation"
+  //               << std::endl;
+  //     }
+  //     // if it has expire time
+  //     else if (false) {
+  //       logFile << req.getID() << ": cached, expires at " << time <<
+  //       std::endl;
+  //     }
+  //   }
+  // }
+  ClientSession::processPOST(req);
+}
+
 void ClientSession::processPOST(Request &req) {
-  //directly forward to original server
-  //ID: Requesting "REQUEST" from SERVER
-  //ID: Received "RESPONSE" from SERVER
+  // directly forward to original server
+  // ID: Requesting "REQUEST" from SERVER
+  // ID: Received "RESPONSE" from SERVER
+  std::string host = req.getTargetHost();
+  std::string port = req.getTargetPort();
+  std::cout << "Host: " << host << " Port: " << port << std::endl;
+
+  boost::asio::io_context &ioContext =
+      static_cast<boost::asio::io_context &>(m_socket.get_executor().context());
+
+  if (m_target_socket.is_open()) {
+    m_target_socket.close();
+  }
+  // Create a new socket for the connection to the target host
+  m_target_socket = tcp::socket(ioContext);
+
+  // Resolve the target host name
+  tcp::resolver resolver(ioContext);
+  auto endpoints = resolver.resolve(host, port);
+  auto self(shared_from_this());
+
+  http::async_write(
+      m_target_socket, m_request,
+      [this, self](boost::system::error_code ec, std::size_t length) {
+        if (!ec) {
+          http::async_read(
+              m_target_socket, m_buffer_target, m_response,
+              [this, self](boost::system::error_code ec, std::size_t length) {
+                if (!ec) {
+                  sendResponse();
+                }
+              });
+        }
+      }
+
+  );
 }
 
 void ClientSession::processCONNECT(Request &req) {
@@ -49,8 +127,12 @@ void ClientSession::processCONNECT(Request &req) {
 
   boost::asio::io_context &ioContext =
       static_cast<boost::asio::io_context &>(m_socket.get_executor().context());
+
+  if (m_target_socket.is_open()) {
+    m_target_socket.close();
+  }
   // Create a new socket for the connection to the target host
-  tcp::socket target_socket(ioContext);
+  m_target_socket = tcp::socket(ioContext);
 
   // Resolve the target host name
   tcp::resolver resolver(ioContext);
@@ -59,20 +141,18 @@ void ClientSession::processCONNECT(Request &req) {
   // Asynchronously connect to the target host
   auto self(shared_from_this());
   boost::asio::async_connect(
-      target_socket, endpoints,
-      [this, self, target_socket = std::move(target_socket)](
-          boost::system::error_code ec, const tcp::endpoint &) {
+      m_target_socket, endpoints,
+      [this, self](boost::system::error_code ec, const tcp::endpoint &) {
         if (!ec) {
+          // boost::asio::socket_base::keep_alive option(true);
+          // m_target_socket.set_option(option);
           // connect successful
+          std::cout << "CONNECT Processed" << std::endl;
           m_response.result(http::status::ok);
           m_response.set(http::field::connection, "keep-alive");
           sendResponse();
-          // TODO: Do we need tunneling here?
-          // If tunneling is required, no need to care about other types of
-          // requests, just forwarding? Otherwise, we need to handle other types
-          // of requests, and we should remember the connection (socket) to the
-          // target host, which may use std::unordered_map to record the
-          // mapping.
+          std::cout << "CONNECT Response sent" << std::endl;
+          startForwarding();
         } else {
           // connect failed
           m_response.result(http::status::bad_gateway);
@@ -83,9 +163,10 @@ void ClientSession::processCONNECT(Request &req) {
 
 ClientSession::RequestHandler
 ClientSession::getHandler(const std::string_view &requestType) {
- //assign it a unique id (ID), and print the ID, time received (TIME), IP address the request was received from (IPFROM) and the
- //HTTP request line (REQUEST) of the request in the following format:
- //ID: "REQUEST" from IPFROM @ TIME
+  // assign it a unique id (ID), and print the ID, time received (TIME), IP
+  // address the request was received from (IPFROM) and the HTTP request line
+  // (REQUEST) of the request in the following format: ID: "REQUEST" from IPFROM
+  // @ TIME
   if (requestType == "GET") {
     return &ClientSession::processGET;
   } else if (requestType == "POST") {
@@ -100,7 +181,10 @@ ClientSession::getHandler(const std::string_view &requestType) {
 }
 
 ClientSession::ClientSession(tcp::socket socket)
-    : m_socket(std::move(socket)) {}
+    : m_socket(std::move(socket)), m_target_socket(m_socket.get_executor()),
+      m_id(session_id) {
+  session_id += 1;
+}
 
 void ClientSession::startService() { readRequest(); }
 
@@ -108,18 +192,17 @@ void ClientSession::startService() { readRequest(); }
 void ClientSession::readRequest() {
   auto self(shared_from_this());
   http::async_read(
-      m_socket, m_buffer, m_request,
+      m_socket, m_buffer_client, m_request,
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
-          std::cout << "Request method: " << m_request.method_string()
-                    << std::endl;
-          std::cout << "Request target: " << m_request.target() << std::endl;
+          std::cout << "Client session " << m_id
+                    << " received a request:" << std::endl;
+          std::cout << m_request << std::endl;
           Request req(m_request);
           ClientSession::RequestHandler handler =
               ClientSession::getHandler(req.getRequestType());
           if (handler) {
             (this->*handler)(req);
-            sendResponse();
           }
           // TODO: Handle unknown request type
           sendResponse();
@@ -136,6 +219,7 @@ void ClientSession::sendResponse() {
         if (!ec) {
           // Read the next request
           // std::cout << "Response sent" << std::endl;
+          m_response.clear();
           readRequest();
         }
       });

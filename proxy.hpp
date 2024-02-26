@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
+#include <cstddef>
 #include <iostream>
 #include <vector>
 
@@ -19,21 +20,27 @@ namespace http = boost::beast::http;
 class ClientSession : public std::enable_shared_from_this<ClientSession> {
 private:
   tcp::socket m_socket;
-  boost::beast::flat_buffer m_buffer;
+  tcp::socket m_target_socket;
+  boost::beast::flat_buffer m_buffer_client;
+  boost::beast::flat_buffer m_buffer_target;
   http::request<http::string_body> m_request;
   http::response<http::string_body> m_response;
+  size_t m_id;
 
   void readRequest();
   void sendResponse();
   void processGET(Request& req);
   void processPOST(Request& req);
   void processCONNECT(Request& req);
+  void startForwarding();
+  void doForward(tcp::socket& source, tcp::socket& target, boost::beast::flat_buffer& buffer);
 
 public:
   explicit ClientSession(tcp::socket socket);
   void startService();
   typedef void (ClientSession::*RequestHandler)(Request&);
   static RequestHandler getHandler(const std::string_view& requestType);
+  size_t getID() const;
 };
 
 // The proxy server listens for incoming client connections
