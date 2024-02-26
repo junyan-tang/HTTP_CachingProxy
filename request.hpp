@@ -21,38 +21,35 @@ protected:
   int version;
 
 public:
-  Request(http::request<http::string_body> &m_req)
+  Request(http::request<http::dynamic_body> &m_req)
       : req(m_req),
         requestType(req.method_string().data(), req.method_string().size()),
-        target(req.target().data(), req.target().size()),
-        version(req.version()), headers(req.base()) {
-    std::cout << target << std::endl;
-  }
+        target(req.target().data(), req.target().size()), headers(req.base()),
+        version(req.version()) {}
   std::string_view getRequestType() { return requestType; }
   std::string_view getTarget() { return target; }
   std::string getTargetHost() {
     std::string host = req["Host"].to_string();
     auto pos = host.find(':');
     if (pos != std::string::npos) {
-        return host.substr(0, pos);
+      return host.substr(0, pos);
     } else {
-        return host;
+      return host;
     }
   }
   std::string getTargetPort() {
     std::string port;
-    if(requestType == "CONNECT"){
+    if (requestType == "CONNECT") {
       port = "443";
-    }
-    else{
+    } else {
       port = "80";
     }
     std::string host = req["Host"].to_string();
     auto pos = host.find(':');
     if (pos != std::string::npos) {
-        return host.substr(pos + 1);
+      return host.substr(pos + 1);
     } else {
-        return port;
+      return port;
     }
   }
   int getVersion() { return version; }

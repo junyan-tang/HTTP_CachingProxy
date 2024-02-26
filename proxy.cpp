@@ -18,7 +18,6 @@ Cache cache(100);
 void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                               boost::beast::flat_buffer &buffer) {
   auto self(shared_from_this());
-  std::cout << "Forwarding data" << std::endl;
   source.async_read_some(
       buffer.prepare(4096), // Adjust the size as needed
       [this, self, &source, &target, &buffer](boost::system::error_code ec,
@@ -61,11 +60,13 @@ void ClientSession::processGET(Request &req) {
   //   http::response<http::string_body> resp = cache.getCachedPage(uri);
   // }
   // else{
-  //   logFile << req.getID() << ": Requesting " << req << " from " << << std::endl;
+  //   logFile << req.getID() << ": Requesting " << req << " from " << <<
+  //   std::endl;
   //   //send to original server and recieve
-  //   logFile << req.getID() << ": Received " << resp << " from " << << std::endl;
+  //   logFile << req.getID() << ": Received " << resp << " from " << <<
+  //   std::endl;
   // }
-  
+
   // // if receive 200-ok
   // if (false) {
   //   // not cacheable
@@ -93,7 +94,8 @@ void ClientSession::processGET(Request &req) {
 void ClientSession::processPOST(Request &req) {
   // directly forward to original servers
   // ID: Received "RESPONSE" from SERVER
-  //logFile << req.getID() << ": Requesting " << req << " from " << << std::endl;
+  // logFile << req.getID() << ": Requesting " << req << " from " << <<
+  // std::endl;
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
   std::cout << "Host: " << host << " Port: " << port << std::endl;
@@ -110,23 +112,38 @@ void ClientSession::processPOST(Request &req) {
   // Resolve the target host name
   tcp::resolver resolver(ioContext);
   auto endpoints = resolver.resolve(host, port);
+
   auto self(shared_from_this());
 
-  http::async_write(
-      m_target_socket, m_request,
-      [this, self](boost::system::error_code ec, std::size_t length) {
+  boost::asio::async_connect(
+      m_target_socket, endpoints,
+      [this, self](boost::system::error_code ec, const tcp::endpoint &) {
         if (!ec) {
-          http::async_read(
-              m_target_socket, m_buffer_target, m_response,
+          http::async_write(
+              m_target_socket, m_request,
               [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
-                  sendResponse();
+                  http::async_read(m_target_socket, m_buffer_target, m_response,
+                                   [this, self](boost::system::error_code ec,
+                                                std::size_t length) {
+                                     if (!ec) {
+                                       std::cout << m_response << std::endl;
+                                       sendResponse();
+                                     }
+                                   });
+                } else {
+                  std::cout << "Post Request Send Error: " << ec.message()
+                            << std::endl;
                 }
-              });
-        }
-      }
+              }
 
-  );
+          );
+        } else {
+          // connect failed
+          m_response.result(http::status::bad_gateway);
+          sendResponse();
+        }
+      });
 }
 
 void ClientSession::processCONNECT(Request &req) {
@@ -155,11 +172,9 @@ void ClientSession::processCONNECT(Request &req) {
           // boost::asio::socket_base::keep_alive option(true);
           // m_target_socket.set_option(option);
           // connect successful
-          std::cout << "CONNECT Processed" << std::endl;
           m_response.result(http::status::ok);
           m_response.set(http::field::connection, "keep-alive");
           sendResponse();
-          std::cout << "CONNECT Response sent" << std::endl;
           startForwarding();
         } else {
           // connect failed
@@ -226,10 +241,11 @@ void ClientSession::sendResponse() {
       [this, self](boost::system::error_code ec, std::size_t length) mutable {
         if (!ec) {
           // Read the next request
-          // std::cout << "Response sent" << std::endl;
+          std::cout << "Response sent" << std::endl;
           std::cout << m_response << std::endl;
-          m_response.clear();
           readRequest();
+        } else {
+          std::cout << "Response Send Error: " << ec.message() << std::endl;
         }
       });
 }

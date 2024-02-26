@@ -3,6 +3,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
+#include <boost/beast/http/dynamic_body.hpp>
 #include <cstddef>
 #include <iostream>
 #include <vector>
@@ -23,8 +24,8 @@ private:
   tcp::socket m_target_socket;
   boost::beast::flat_buffer m_buffer_client;
   boost::beast::flat_buffer m_buffer_target;
-  http::request<http::string_body> m_request;
-  http::response<http::string_body> m_response;
+  http::request<http::dynamic_body> m_request;
+  http::response<http::dynamic_body> m_response;
   size_t m_id;
 
   void readRequest();
