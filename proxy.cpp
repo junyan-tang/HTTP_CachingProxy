@@ -114,7 +114,7 @@ void ClientSession::processPOST(Request &req) {
   auto endpoints = resolver.resolve(host, port);
 
   auto self(shared_from_this());
-
+  
   boost::asio::async_connect(
       m_target_socket, endpoints,
       [this, self](boost::system::error_code ec, const tcp::endpoint &) {
@@ -127,7 +127,6 @@ void ClientSession::processPOST(Request &req) {
                                    [this, self](boost::system::error_code ec,
                                                 std::size_t length) {
                                      if (!ec) {
-                                       std::cout << m_response << std::endl;
                                        sendResponse();
                                      }
                                    });
@@ -228,7 +227,6 @@ void ClientSession::readRequest() {
             (this->*handler)(req);
           }
           // TODO: Handle unknown request type
-          sendResponse();
         }
       });
 }
@@ -238,7 +236,7 @@ void ClientSession::sendResponse() {
   auto self(shared_from_this());
   http::async_write(
       m_socket, m_response,
-      [this, self](boost::system::error_code ec, std::size_t length) mutable {
+      [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
           // Read the next request
           std::cout << "Response sent" << std::endl;
