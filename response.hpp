@@ -30,6 +30,17 @@ public:
   http::fields getHeaders() { return headers; }
   std::string getBody() { return body; }
   http::response<http::string_body> getResponse() { return res; }
+  std::string checkExpireTime(http::response<http::string_body> resp){
+    std::string expire_time;
+    auto it = resp.find(http::field::expires);
+    if(it != resp.end()){
+      expire_time = it->value().to_string();
+    }
+    else{
+      expire_time = "";
+    }
+    return expire_time;
+  }
 };
 
 #endif
