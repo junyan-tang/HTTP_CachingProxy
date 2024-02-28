@@ -1,55 +1,46 @@
 #include "cache.hpp"
 #include "log.hpp"
 
-// bool compareExpireTime(http::response<http::string_body> resp){
-//   if(expire_time != ""){
-//     std::tm tm = {};
-//     std::istringstream ss(expire_time);
-//     ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+bool compareExpireTime(http::response<http::string_body> resp, std::string expire_time){
+  int max_age = -1;
+  if(resp.find("Cache-Control") != resp.end()) {
+    std::string cache_control = resp["Cache-Control"].to_string();  
+    std::regex max_age_regex(R"(max-age=(\d+))");
+    std::smatch match;
+    if(std::regex_search(cache_control, match, max_age_regex) && match.size() > 1) {
+        max_age = stoi(match[1].str());
+    } 
+  } 
+  
+  if(expire_time != ""){
+    std::tm tm = {};
+    std::istringstream ss(expire_time);
+    ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
 
-//     auto expireTime = std::chrono::system_clock::from_time_t(std::mktime(&tm));
-//     auto now = std::chrono::system_clock::now();
-//     if(now > expireTime){
-//       return false;
-//     }
-//     else if(max_age_str == ""){
-//       return true;
-//     }
-//   }
-//   if(max_age_str != ""){
-//     int max_age = std::stoi(max_age_str);
-//     auto expireTime = resp_time + max_age;
-//     auto now = std::chrono::system_clock::now();
-//     return (now > expireTime) ? false:true;
-//   }
-//   return false;
-// }
-  // std::string checkExpireTime(){
-  //   std::string expire_time;
-  //   auto it = res.find(http::field::expires);
-  //   if(it != res.end()){
-  //     expire_time = it->value().to_string();
-  //   }
-  //   else{
-  //     expire_time = "";
-  //   }
-  //   return expire_time;
-  // }
-  // std::string getMaxAge(){
-  //   if(res.find("Cache-Control") != res.end()) {
-  //       std::string cache_control = res["Cache-Control"].to_string();  
-  //       std::regex max_age_regex(R"(max-age=(\d+))");
-  //       std::smatch match;
-  //       if(std::regex_search(cache_control, match, max_age_regex) && match.size() > 1) {
-  //           return match[1].str();
-  //       } 
-  //   } 
-  //   return "";
-  // }
-  // std::string getResponseTime(){
-  //   return ;
-  // }
-
+    auto expireTime = std::chrono::system_clock::from_time_t(std::mktime(&tm));
+    auto now = std::chrono::system_clock::now();
+    if(now > expireTime){
+      return false;
+    }
+    else if(max_age == -1){
+      return true;
+    }
+  }
+  if(max_age != -1) {
+    if(resp.find("Date") != resp.end()){
+      std::string date = resp["Date"].to_string();
+      std::tm tm = {};
+      std::istringstream ss(date);
+      ss >> std::get_time(&tm, "%a, %d %b %Y %H:%M:%S");
+      auto max_age_time = std::chrono::seconds(max_age);
+      auto expireTime = std::chrono::system_clock::from_time_t(std::mktime(&tm)) + max_age_time;
+      auto now = std::chrono::system_clock::now();
+      return (now > expireTime) ? false:true;
+    }
+  }
+  return false;
+}
+ 
 bool Cache::checkValidation(http::response<http::string_body> resp){
   if (resp.find(http::field::cache_control) != resp.end()) {
         std::string cache_control = resp.at(http::field::cache_control).to_string();
@@ -68,9 +59,9 @@ bool Cache::isCacheUsable(std::string_view &uri, int req_id){
   }
   else{
     Response resp = cacheBase[uri];
-    //if(compareExpireTime(resp.getResponse()){
-    if(false){
-      //logFile << req_id << ": in cache, but expired at " << resp.checkExpireTime() << std::endl;
+    std::string expire_time = resp.checkExpireTime(resp.getResponse());
+    if(compareExpireTime(resp.getResponse(), expire_time)){
+      logFile << req_id << ": in cache, but expired at " << expire_time << std::endl;
     }
     else if(checkValidation(resp.getResponse())){
       logFile << req_id << ": in cache, requires validation" << std::endl;

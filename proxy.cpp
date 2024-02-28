@@ -98,6 +98,7 @@ void ClientSession::processPOST(Request &req) {
   // ID: Received "RESPONSE" from SERVER
   // logFile << req.getID() << ": Requesting " << req << " from " << <<
   // std::endl;
+  std::cout << "Enter GET/POST:" << m_request << std::endl;
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
   std::cout << "Host: " << host << " Port: " << port << std::endl;
@@ -125,6 +126,7 @@ void ClientSession::processPOST(Request &req) {
               m_target_socket, m_request,
               [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
+                  std::cout << "After connect" << m_request << std::endl;
                   http::async_read(m_target_socket, m_buffer_target, m_response,
                                    [this, self](boost::system::error_code ec,
                                                 std::size_t length) {
