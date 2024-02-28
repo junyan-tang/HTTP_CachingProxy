@@ -27,21 +27,23 @@ private:
   http::request<http::dynamic_body> m_request;
   http::response<http::dynamic_body> m_response;
   size_t m_id;
+  bool is_forwarding = false;
 
   void readRequest();
   void sendResponse();
-  void processGET(Request& req);
-  void processPOST(Request& req);
-  void processCONNECT(Request& req);
+  void processGET(Request &req);
+  void processPOST(Request &req);
+  void processCONNECT(Request &req);
   void startForwarding();
-  void doForward(tcp::socket& source, tcp::socket& target, boost::beast::flat_buffer& buffer);
+  void doForward(tcp::socket &source, tcp::socket &target,
+                 boost::beast::flat_buffer &buffer);
 
 public:
   explicit ClientSession(tcp::socket socket);
   void startService();
-  typedef void (ClientSession::*RequestHandler)(Request&);
-  static RequestHandler getHandler(const std::string_view& requestType);
-  //size_t getID() const;
+  typedef void (ClientSession::*RequestHandler)(Request &);
+  static RequestHandler getHandler(const std::string_view &requestType);
+  // size_t getID() const;
 };
 
 // The proxy server listens for incoming client connections

@@ -35,14 +35,16 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                             buffer); // Continue the forwarding loop
                 } else {
                   // Handle write error or close connection
-                  source.close();
-                  target.close();
+                  m_target_socket.close();
+                  is_forwarding = false;
+                  readRequest();
                 }
               });
         } else {
           // Handle read error or close connection
-          source.close();
-          target.close();
+          m_target_socket.close();
+          is_forwarding = false;
+          readRequest();
         }
       });
 }
@@ -114,7 +116,7 @@ void ClientSession::processPOST(Request &req) {
   auto endpoints = resolver.resolve(host, port);
 
   auto self(shared_from_this());
-  
+
   boost::asio::async_connect(
       m_target_socket, endpoints,
       [this, self](boost::system::error_code ec, const tcp::endpoint &) {
@@ -173,6 +175,7 @@ void ClientSession::processCONNECT(Request &req) {
           // connect successful
           m_response.result(http::status::ok);
           m_response.set(http::field::connection, "keep-alive");
+          is_forwarding = true;
           sendResponse();
           startForwarding();
         } else {
@@ -187,7 +190,8 @@ ClientSession::RequestHandler
 ClientSession::getHandler(const std::string_view &requestType) {
   // assign it a unique id (ID), and print the ID, time received (TIME), IP
   // address the request was received from (IPFROM) and the HTTP request line
-  // (REQUEST) of the request in the following format: ID: "REQUEST" from IPFROM
+  // (REQUEST) of the request in the following format: ID: "REQUEST" from
+  // IPFROM
   // @ TIME
   if (requestType == "GET") {
     return &ClientSession::processGET;
@@ -241,7 +245,9 @@ void ClientSession::sendResponse() {
           // Read the next request
           std::cout << "Response sent" << std::endl;
           std::cout << m_response << std::endl;
-          readRequest();
+          if (!is_forwarding) {
+            readRequest();
+          }
         } else {
           std::cout << "Response Send Error: " << ec.message() << std::endl;
         }
