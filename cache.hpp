@@ -19,7 +19,7 @@ protected:
 
 public:
   Cache(size_t cap) : cacheCapacity(cap) {}
-  void addToCache(std::string_view &url, Response &response);
+  void addToCache(std::string_view &uri, Response &response);
   void removeFromCache();
   bool isCacheFull();
   bool isInCache(std::string_view &uri);

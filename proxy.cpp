@@ -1,6 +1,6 @@
 #include "proxy.hpp"
 #include "cache.hpp"
-// #include "log.hpp"
+#include "log.hpp"
 #include "request.hpp"
 #include <boost/beast/http/read.hpp>
 #include <iostream>
@@ -11,8 +11,7 @@
 
 namespace http = boost::beast::http;
 
-static size_t session_id = 0;
-static int request_id = 0;
+static size_t session_id = 1;
 Cache cache(100);
 
 void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
@@ -56,48 +55,35 @@ void ClientSession::startForwarding() {
 }
 
 void ClientSession::processGET(Request &req) {
-  // std::string_view uri = req.getTarget();
-  // // check if it in cache and can be use
-  // if (cache.isCacheUsable(uri, req.getID())){
-  //   http::response<http::string_body> resp = cache.getCachedPage(uri);
-  // }
-  // else{
-  //   logFile << req.getID() << ": Requesting " << req << " from " << <<
-  //   std::endl;
-  //   //send to original server and recieve
-  //   logFile << req.getID() << ": Received " << resp << " from " << <<
-  //   std::endl;
-  // }
-
-  // // if receive 200-ok
-  // if (false) {
-  //   // not cacheable
-  //   if (false) {
-  //     // add reason
-  //     logFile << req.getID() << ": not cacheable because "
-  //             << "reason holder" << std::endl;
-  //   } else {
-  //     // add to cache
-  //     //  if need revalidation
-  //     if (false) {
-  //       logFile << req.getID() << ": cached, but requires re-validation"
-  //               << std::endl;
-  //     }
-  //     // if it has expire time
-  //     else if (false) {
-  //       logFile << req.getID() << ": cached, expires at " << time <<
-  //       std::endl;
-  //     }
-  //   }
-  // }
+  std::string_view uri = req.getTarget();
+  
+  if (cache.isCacheUsable(uri, session_id)){
+    http::response<http::string_body> resp = cache.getCachedPage(uri);
+  }
+  else{
+    logFile << session_id << ": Requesting " << req.getFirstLine() << " from " << req.getTargetHost() << std::endl;  
+  }
   ClientSession::processPOST(req);
+  Response resp(m_response);
+
+  if (resp.getStatusCode() == 200) {
+    if (resp.isCacheable() != "") {
+      logFile << session_id << ": not cacheable because "
+              << resp.isCacheable() << std::endl;
+    } else {
+      cache.addToCache(uri, resp);
+      if (cache.checkValidation(resp.getResponse())) {
+        logFile << session_id << ": cached, but requires re-validation"
+                << std::endl;
+      }
+      else if (resp.checkExpireTime() != "") {
+        logFile << session_id << ": cached, expires at " << resp.checkExpireTime() << std::endl;
+      }
+    }
+  }
 }
 
 void ClientSession::processPOST(Request &req) {
-  // directly forward to original servers
-  // ID: Received "RESPONSE" from SERVER
-  // logFile << req.getID() << ": Requesting " << req << " from " << <<
-  // std::endl;
   std::cout << "Enter GET/POST:" << m_request << std::endl;
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
@@ -203,6 +189,7 @@ ClientSession::getHandler(const std::string_view &requestType) {
     return &ClientSession::processCONNECT;
   } else {
     // Handle unknown request type
+    // logFile << req.getID() << 
     // ID: Responding "RESPONSE" receive a malformed request
     return nullptr;
   }

@@ -34,6 +34,7 @@ private:
   void processGET(Request &req);
   void processPOST(Request &req);
   void processCONNECT(Request &req);
+  void processMalformed();
   void startForwarding();
   void doForward(tcp::socket &source, tcp::socket &target,
                  boost::beast::flat_buffer &buffer);
@@ -43,7 +44,6 @@ public:
   void startService();
   typedef void (ClientSession::*RequestHandler)(Request &);
   static RequestHandler getHandler(const std::string_view &requestType);
-  // size_t getID() const;
 };
 
 // The proxy server listens for incoming client connections

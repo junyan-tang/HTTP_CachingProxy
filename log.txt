@@ -1,0 +1,116 @@
+154: not in cache
+154: Requesting GET http://ipv6.msftconnecttest.com/connecttest.txt HTTP/1.1 from ipv6.msftconnecttest.com
+155: in cache, valid
+157: not in cache
+157: Requesting GET http://ocsp.pki.goog/gtsr1/MEwwSjBIMEYwRDAHBgUrDgMCGgQUMJHC1g%2BC6hie2xOwdV2bBG5n8FAEFOSvKyZxGitIJ4UvUmYs7%2FCJE3E%2BAg0CA7xTWWs0xxj1AVBm HTTP/1.1 from ocsp.pki.goog
+158: not in cache
+158: Requesting GET http://ocsp.pki.goog/gts1c3/MFAwTjBMMEowSDAHBgUrDgMCGgQUxy55it3%2FYTSzuu1HQri7xsAkB2MEFIp0f6%2BFze6VzT2c0OJGFPNxNR0nAhEA5GkE%2Fgb28rMQhPOTvCl2Eg%3D%3D HTTP/1.1 from ocsp.pki.goog
+165: not in cache
+165: Requesting GET http://ocsp.digicert.com/ME8wTTBLMEkwRzAHBgUrDgMCGgQUwS9Fdu0VWeywXbqJv52AeOUj1BMEFOWdWTCCR1jMrPoIVDaGezq1BE3wAhAKSNV8ZfsObPcEo2RfFBjk HTTP/1.1 from ocsp.digicert.com
+167: not in cache
+167: Requesting GET http://ocsp.digicert.com/ME8wTTBLMEkwRzAHBgUrDgMCGgQU36oS4yixCUGT4p9Cgs5HQEKVWKMEFLE%2Bw2kD%2BL9HAdSYJhoIAu9jZCvDAhAHF3kRAF0iZ%2FaIkvaPi1BY HTTP/1.1 from ocsp.digicert.com
+172: not in cache
+172: Requesting GET http://download.windowsupdate.com/d/msdownload/update/others/2024/02/40791029_eb8ea4803f77fa4eda3a9d41a716188b68f317cc.cab HTTP/1.1 from download.windowsupdate.com
+172: not in cache
+172: Requesting GET http://download.windowsupdate.com/d/msdownload/update/others/2024/02/40791028_e4fb7702a27457b34e1b360aee0c2b47a911a5bb.cab HTTP/1.1 from download.windowsupdate.com
+176: not in cache
+176: Requesting GET http://151.139.31.155/filestreamingservice//files/c1ce84ae-a85d-433c-a740-5b5235609754/pieceshash?cacheHostOrigin=dl.delivery.mp.microsoft.com HTTP/1.1 from 151.139.31.155
+178: not in cache
+178: Requesting GET http://dl.delivery.mp.microsoft.com/filestreamingservice//files/b1a92642-9cc5-4f4b-898f-16eb469875e8/pieceshash HTTP/1.1 from dl.delivery.mp.microsoft.com
+180: not in cache
+180: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/b1a92642-9cc5-4f4b-898f-16eb469875e8?P1=1709173355&P2=404&P3=2&P4=KwhBgDFZhLTgyqI4UmYodp0LL%2fZRbzz%2fOGiNmy%2fG81Ku9bjG%2benhnyMklbWagIrNGVIe1xUTOAMh1ZMzrN%2bXjw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+181: not in cache
+181: Requesting GET http://dl.delivery.mp.microsoft.com/filestreamingservice//files/6acb60c0-64dd-44fa-bb7d-4bf5524c7aaf/pieceshash HTTP/1.1 from dl.delivery.mp.microsoft.com
+183: not in cache
+183: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/6acb60c0-64dd-44fa-bb7d-4bf5524c7aaf?P1=1709173219&P2=404&P3=2&P4=kR%2bkhZ4tHnfEdqNhBRPw03ls2QJgsS1uy4n6svmdmvSe%2bW95II0GqZGfVd5vy5nEjeNJQbY2lNftwIwGbZLfQw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+185: not in cache
+185: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/6acb60c0-64dd-44fa-bb7d-4bf5524c7aaf?P1=1709173219&P2=404&P3=2&P4=kR%2bkhZ4tHnfEdqNhBRPw03ls2QJgsS1uy4n6svmdmvSe%2bW95II0GqZGfVd5vy5nEjeNJQbY2lNftwIwGbZLfQw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+186: not in cache
+186: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/b1a92642-9cc5-4f4b-898f-16eb469875e8?P1=1709173355&P2=404&P3=2&P4=KwhBgDFZhLTgyqI4UmYodp0LL%2fZRbzz%2fOGiNmy%2fG81Ku9bjG%2benhnyMklbWagIrNGVIe1xUTOAMh1ZMzrN%2bXjw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+187: not in cache
+187: Requesting GET http://dl.delivery.mp.microsoft.com/filestreamingservice//files/c1ce84ae-a85d-433c-a740-5b5235609754/pieceshash HTTP/1.1 from dl.delivery.mp.microsoft.com
+189: in cache, valid
+190: in cache, valid
+192: in cache, valid
+193: not in cache
+193: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/b1a92642-9cc5-4f4b-898f-16eb469875e8?P1=1709173355&P2=404&P3=2&P4=KwhBgDFZhLTgyqI4UmYodp0LL%2fZRbzz%2fOGiNmy%2fG81Ku9bjG%2benhnyMklbWagIrNGVIe1xUTOAMh1ZMzrN%2bXjw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+194: in cache, valid
+196: not in cache
+196: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/6acb60c0-64dd-44fa-bb7d-4bf5524c7aaf?P1=1709173219&P2=404&P3=2&P4=kR%2bkhZ4tHnfEdqNhBRPw03ls2QJgsS1uy4n6svmdmvSe%2bW95II0GqZGfVd5vy5nEjeNJQbY2lNftwIwGbZLfQw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+197: in cache, valid
+198: in cache, valid
+199: in cache, valid
+200: not in cache
+200: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/c1ce84ae-a85d-433c-a740-5b5235609754?P1=1709174682&P2=404&P3=2&P4=E7BasXDqAGWo%2b5hHL%2b1t9YAyYt8GwmE9iekWmnRhCNRTWvCQMmS3ztVzhon%2fX4g55Amhjq4%2bLyDt%2bnQwRFwXKA%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+201: in cache, valid
+202: not in cache
+202: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/6acb60c0-64dd-44fa-bb7d-4bf5524c7aaf?P1=1709173219&P2=404&P3=2&P4=kR%2bkhZ4tHnfEdqNhBRPw03ls2QJgsS1uy4n6svmdmvSe%2bW95II0GqZGfVd5vy5nEjeNJQbY2lNftwIwGbZLfQw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+203: in cache, valid
+204: in cache, valid
+205: in cache, valid
+206: in cache, valid
+207: not in cache
+207: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/b1a92642-9cc5-4f4b-898f-16eb469875e8?P1=1709173355&P2=404&P3=2&P4=KwhBgDFZhLTgyqI4UmYodp0LL%2fZRbzz%2fOGiNmy%2fG81Ku9bjG%2benhnyMklbWagIrNGVIe1xUTOAMh1ZMzrN%2bXjw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+208: in cache, valid
+209: not in cache
+209: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/c1ce84ae-a85d-433c-a740-5b5235609754?P1=1709174682&P2=404&P3=2&P4=E7BasXDqAGWo%2b5hHL%2b1t9YAyYt8GwmE9iekWmnRhCNRTWvCQMmS3ztVzhon%2fX4g55Amhjq4%2bLyDt%2bnQwRFwXKA%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+210: not in cache
+210: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/6acb60c0-64dd-44fa-bb7d-4bf5524c7aaf?P1=1709173219&P2=404&P3=2&P4=kR%2bkhZ4tHnfEdqNhBRPw03ls2QJgsS1uy4n6svmdmvSe%2bW95II0GqZGfVd5vy5nEjeNJQbY2lNftwIwGbZLfQw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+211: not in cache
+211: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/b1a92642-9cc5-4f4b-898f-16eb469875e8?P1=1709173355&P2=404&P3=2&P4=KwhBgDFZhLTgyqI4UmYodp0LL%2fZRbzz%2fOGiNmy%2fG81Ku9bjG%2benhnyMklbWagIrNGVIe1xUTOAMh1ZMzrN%2bXjw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+212: in cache, valid
+213: in cache, valid
+214: not in cache
+214: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/b1a92642-9cc5-4f4b-898f-16eb469875e8?P1=1709173355&P2=404&P3=2&P4=KwhBgDFZhLTgyqI4UmYodp0LL%2fZRbzz%2fOGiNmy%2fG81Ku9bjG%2benhnyMklbWagIrNGVIe1xUTOAMh1ZMzrN%2bXjw%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+215: in cache, valid
+216: in cache, valid
+217: in cache, valid
+219: in cache, valid
+220: not in cache
+220: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/c1ce84ae-a85d-433c-a740-5b5235609754?P1=1709174682&P2=404&P3=2&P4=E7BasXDqAGWo%2b5hHL%2b1t9YAyYt8GwmE9iekWmnRhCNRTWvCQMmS3ztVzhon%2fX4g55Amhjq4%2bLyDt%2bnQwRFwXKA%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+221: in cache, valid
+222: in cache, valid
+224: in cache, valid
+225: not in cache
+225: Requesting GET http://1d.tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/c1ce84ae-a85d-433c-a740-5b5235609754?P1=1709174682&P2=404&P3=2&P4=E7BasXDqAGWo%2b5hHL%2b1t9YAyYt8GwmE9iekWmnRhCNRTWvCQMmS3ztVzhon%2fX4g55Amhjq4%2bLyDt%2bnQwRFwXKA%3d%3d HTTP/1.1 from 1d.tlu.dl.delivery.mp.microsoft.com
+226: in cache, valid
+227: in cache, valid
+228: in cache, valid
+229: in cache, valid
+232: in cache, valid
+233: in cache, valid
+235: in cache, valid
+236: in cache, valid
+237: in cache, valid
+238: in cache, valid
+239: in cache, valid
+240: in cache, valid
+241: in cache, valid
+242: in cache, valid
+243: in cache, valid
+244: in cache, valid
+245: in cache, valid
+246: in cache, valid
+247: in cache, valid
+248: in cache, valid
+249: in cache, valid
+250: in cache, valid
+251: in cache, valid
+252: in cache, valid
+253: in cache, valid
+254: in cache, valid
+255: in cache, valid
+256: in cache, valid
+257: in cache, valid
+258: in cache, valid
+259: in cache, valid
+260: in cache, valid
+261: in cache, valid
+262: in cache, valid
+263: in cache, valid
+264: in cache, valid
+266: in cache, valid
+267: in cache, valid
+269: in cache, valid
+270: in cache, valid
+271: in cache, valid
