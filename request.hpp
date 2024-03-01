@@ -54,9 +54,10 @@ public:
   int getVersion() { return version; }
   http::fields getHeaders() { return headers; }
   http::request<http::string_body> getRequest() { return req; }
-  std::string getFirstLine(){
+  std::string getFirstLine() {
     std::ostringstream ss;
-    ss << requestType << " " << target << " HTTP/" << version / 10 << "." << version % 10;
+    ss << requestType << " " << target << " HTTP/" << version / 10 << "."
+       << version % 10;
     return ss.str();
   }
 };
