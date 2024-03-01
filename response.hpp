@@ -62,10 +62,19 @@ public:
       if(cache_control.find("no-store") != std::string::npos){
         return "This page can't be cached.";
       }
-      if(cache_control.find("private") != std::string::npos){
+      if(cache_control.find("private") != std::string::npos ){
         return "This page is private.";
       }
+
+
+
+       if(res.find("ETag") != res.end()) {
+            std::cout << "ETag: " << res["ETag"] << std::endl;
+        } else {
+            std::cout << "ETag header not found in the response." << std::endl;
+        }
     } 
+    
     return "";
   } 
 };
