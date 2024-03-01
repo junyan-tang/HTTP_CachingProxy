@@ -36,16 +36,12 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                   // Handle write error or close connection
                   m_target_socket.close();
                   is_forwarding = false;
-                  logFile << m_id << ": Tunnel closed" << std::endl;
-                  readRequest();
                 }
               });
         } else {
           // Handle read error or close connection
           m_target_socket.close();
           is_forwarding = false;
-          logFile << m_id << ": Tunnel closed" << std::endl;
-          readRequest();
         }
       });
 }
@@ -54,6 +50,7 @@ void ClientSession::startForwarding() {
   auto self(shared_from_this());
   doForward(m_socket, m_target_socket, m_buffer_client);
   doForward(m_target_socket, m_socket, m_buffer_target);
+  logFile << m_id << ": Tunnel closed" << std::endl;
 }
 
 void ClientSession::processGET(Request &req) {
@@ -89,11 +86,10 @@ void ClientSession::processGET(Request &req) {
     } else {
       cache.addToCache(uri, resp);
       if (cache.checkValidation(resp.getResponse())) {
-        logFile << m_id << ": cached, but requires re-validation"
-                << std::endl;
+        logFile << m_id << ": cached, but requires re-validation" << std::endl;
       } else if (resp.checkExpireTime() != "") {
-        logFile << m_id << ": cached, expires at "
-                << resp.checkExpireTime() << std::endl;
+        logFile << m_id << ": cached, expires at " << resp.checkExpireTime()
+                << std::endl;
       }
     }
   } else if(respCode == 304){
@@ -200,9 +196,6 @@ ClientSession::getHandler(const std::string_view &requestType) {
   } else if (requestType == "CONNECT") {
     return &ClientSession::processCONNECT;
   } else {
-    // handle malformed type
-    logFile << m_id << ": Responding "
-            << " receive a malformed request" << std::endl;
     return nullptr;
   }
 }
@@ -233,6 +226,11 @@ void ClientSession::readRequest() {
               ClientSession::getHandler(req.getRequestType());
           if (handler) {
             (this->*handler)(req);
+          } else {
+            m_response.result(http::status::bad_request);
+            logFile << m_id << ": Responding "
+                    << " receive a malformed request" << std::endl;
+            sendResponse();
           }
           // TODO: Handle unknown request type
         }
