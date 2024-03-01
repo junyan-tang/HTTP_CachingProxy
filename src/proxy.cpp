@@ -93,7 +93,7 @@ void ClientSession::processGET(Request &req) {
       }
     }
   } else if(respCode == 304){
-    logFile << session_id << ": Not modified" << std::endl;
+    logFile << m_id << ": Not modified" << std::endl;
   }
 }
 

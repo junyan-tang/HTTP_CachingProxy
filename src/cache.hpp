@@ -1,7 +1,6 @@
 #ifndef __CACHE_HPP__
 #define __CACHE_HPP__
 #include "response.hpp"
-#include "request.hpp"
 #include <boost/beast/http.hpp>
 #include <chrono>
 #include <ctime>

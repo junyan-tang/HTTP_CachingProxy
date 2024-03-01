@@ -12,7 +12,7 @@ namespace http = boost::beast::http;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
-std::string getETag(http::response<http::string_body> &res){
+inline std::string getETag(http::response<http::string_body> res){
     auto etag = res.find(http::field::etag);
     if (etag == res.end()){
       return "";
@@ -21,7 +21,7 @@ std::string getETag(http::response<http::string_body> &res){
     }
   }
 
-std::string getLastModified(http::response<http::string_body> &res){
+inline std::string getLastModified(http::response<http::string_body> res){
   auto last_modified = res.find(http::field::last_modified);
   if (last_modified == res.end()){
     return "";
@@ -86,6 +86,8 @@ public:
     }
     return "";
   }
+
+  
 };
 
 #endif
