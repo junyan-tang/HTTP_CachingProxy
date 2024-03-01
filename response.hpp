@@ -63,16 +63,9 @@ public:
         return "This page is private.";
       }
     }
+    if(res.find("ETag") != res.end()){
 
-
-
-       if(res.find("ETag") != res.end()) {
-            std::cout << "ETag: " << res["ETag"] << std::endl;
-        } else {
-            std::cout << "ETag header not found in the response." << std::endl;
-        }
-    } 
-    
+    }
     return "";
   }
 };
