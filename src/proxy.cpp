@@ -11,7 +11,7 @@
 
 namespace http = boost::beast::http;
 
-static size_t session_id = 1;
+static size_t session_id = 0;
 Cache cache(100);
 
 void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
@@ -36,6 +36,7 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                   // Handle write error or close connection
                   m_target_socket.close();
                   is_forwarding = false;
+                  logFile << m_id << ": Tunnel closed" << std::endl;
                   readRequest();
                 }
               });
@@ -43,6 +44,7 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
           // Handle read error or close connection
           m_target_socket.close();
           is_forwarding = false;
+          logFile << m_id << ": Tunnel closed" << std::endl;
           readRequest();
         }
       });
@@ -56,7 +58,7 @@ void ClientSession::startForwarding() {
 
 void ClientSession::processGET(Request &req) {
   std::string_view uri = req.getTarget();
-  std::string cache_status = cache.isCacheUsable(uri, session_id);
+  std::string cache_status = cache.isCacheUsable(uri, m_id);
   http::request<http::string_body> req_body = req.getRequest();
 
   if (cache_status == "valid") {
@@ -73,7 +75,7 @@ void ClientSession::processGET(Request &req) {
     }
     ClientSession::requestFromServer(req);
   } else {
-    logFile << session_id << ": Requesting " << req.getFirstLine() << " from "
+    logFile << m_id << ": Requesting " << req.getFirstLine() << " from "
             << req.getTargetHost() << std::endl;
     ClientSession::requestFromServer(req);
   }
@@ -82,15 +84,15 @@ void ClientSession::processGET(Request &req) {
 
   if (respCode == 200) {
     if (resp.isCacheable() != "") {
-      logFile << session_id << ": not cacheable because " << resp.isCacheable()
+      logFile << m_id << ": not cacheable because " << resp.isCacheable()
               << std::endl;
     } else {
       cache.addToCache(uri, resp);
       if (cache.checkValidation(resp.getResponse())) {
-        logFile << session_id << ": cached, but requires re-validation"
+        logFile << m_id << ": cached, but requires re-validation"
                 << std::endl;
       } else if (resp.checkExpireTime() != "") {
-        logFile << session_id << ": cached, expires at "
+        logFile << m_id << ": cached, expires at "
                 << resp.checkExpireTime() << std::endl;
       }
     }
@@ -147,7 +149,7 @@ void ClientSession::requestFromServer(Request &req) {
 }
 
 void ClientSession::processPOST(Request &req) {
-  logFile << session_id << ": Requesting " << req.getFirstLine() << " from "
+  logFile << m_id << ": Requesting " << req.getFirstLine() << " from "
           << req.getTargetHost() << std::endl;
   ClientSession::requestFromServer(req);
 }
@@ -187,7 +189,6 @@ void ClientSession::processCONNECT(Request &req) {
           sendResponse();
         }
       });
-  logFile << session_id << ": Tunnel closed" << std::endl;
 }
 
 ClientSession::RequestHandler
@@ -200,7 +201,7 @@ ClientSession::getHandler(const std::string_view &requestType) {
     return &ClientSession::processCONNECT;
   } else {
     // handle malformed type
-    logFile << session_id << ": Responding "
+    logFile << m_id << ": Responding "
             << " receive a malformed request" << std::endl;
     return nullptr;
   }
@@ -226,7 +227,7 @@ void ClientSession::readRequest() {
               m_socket.remote_endpoint().address().to_string();
           auto receive_time = std::chrono::system_clock::to_time_t(
               std::chrono::system_clock::now());
-          logFile << session_id << ": \"" << req.getFirstLine() << "\" from "
+          logFile << m_id << ": \"" << req.getFirstLine() << "\" from "
                   << ip_from << " @ " << std::ctime(&receive_time);
           ClientSession::RequestHandler handler =
               ClientSession::getHandler(req.getRequestType());
