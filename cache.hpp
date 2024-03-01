@@ -2,13 +2,13 @@
 #define __CACHE_HPP__
 #include "response.hpp"
 #include <boost/beast/http.hpp>
-#include <map>
-#include <queue>
-#include <string>
 #include <chrono>
-#include <sstream>
 #include <ctime>
 #include <iomanip>
+#include <map>
+#include <queue>
+#include <sstream>
+#include <string>
 
 namespace http = boost::beast::http;
 class Cache {

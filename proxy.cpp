@@ -56,28 +56,28 @@ void ClientSession::startForwarding() {
 
 void ClientSession::processGET(Request &req) {
   std::string_view uri = req.getTarget();
-  
-  if (cache.isCacheUsable(uri, session_id)){
+
+  if (cache.isCacheUsable(uri, session_id)) {
     http::response<http::string_body> resp = cache.getCachedPage(uri);
-  }
-  else{
-    logFile << session_id << ": Requesting " << req.getFirstLine() << " from " << req.getTargetHost() << std::endl;  
+  } else {
+    logFile << session_id << ": Requesting " << req.getFirstLine() << " from "
+            << req.getTargetHost() << std::endl;
   }
   ClientSession::requestFromServer(req);
   Response resp(m_response);
 
   if (resp.getStatusCode() == 200) {
     if (resp.isCacheable() != "") {
-      logFile << session_id << ": not cacheable because "
-              << resp.isCacheable() << std::endl;
+      logFile << session_id << ": not cacheable because " << resp.isCacheable()
+              << std::endl;
     } else {
       cache.addToCache(uri, resp);
       if (cache.checkValidation(resp.getResponse())) {
         logFile << session_id << ": cached, but requires re-validation"
                 << std::endl;
-      }
-      else if (resp.checkExpireTime() != "") {
-        logFile << session_id << ": cached, expires at " << resp.checkExpireTime() << std::endl;
+      } else if (resp.checkExpireTime() != "") {
+        logFile << session_id << ": cached, expires at "
+                << resp.checkExpireTime() << std::endl;
       }
     }
   }
@@ -121,8 +121,7 @@ void ClientSession::requestFromServer(Request &req) {
                   std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
                 }
-              }
-          );
+              });
         } else {
           // connect failed
           m_response.result(http::status::bad_gateway);
@@ -132,7 +131,8 @@ void ClientSession::requestFromServer(Request &req) {
 }
 
 void ClientSession::processPOST(Request &req) {
-  logFile << session_id << ": Requesting " << req.getFirstLine() << " from " << req.getTargetHost() << std::endl;  
+  logFile << session_id << ": Requesting " << req.getFirstLine() << " from "
+          << req.getTargetHost() << std::endl;
   ClientSession::requestFromServer(req);
 }
 
@@ -183,8 +183,9 @@ ClientSession::getHandler(const std::string_view &requestType) {
   } else if (requestType == "CONNECT") {
     return &ClientSession::processCONNECT;
   } else {
-    //handle malformed type
-    logFile << session_id << ": Responding " << " receive a malformed request" << std::endl; 
+    // handle malformed type
+    logFile << session_id << ": Responding "
+            << " receive a malformed request" << std::endl;
     return nullptr;
   }
 }
@@ -205,10 +206,12 @@ void ClientSession::readRequest() {
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
           Request req(m_request);
-          std::string ip_from = m_socket.remote_endpoint().address().to_string();
-          auto receive_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-          logFile << session_id << ": \"" << req.getFirstLine() 
-                  << "\" from " << ip_from << " @ " << std::ctime(&receive_time);
+          std::string ip_from =
+              m_socket.remote_endpoint().address().to_string();
+          auto receive_time = std::chrono::system_clock::to_time_t(
+              std::chrono::system_clock::now());
+          logFile << session_id << ": \"" << req.getFirstLine() << "\" from "
+                  << ip_from << " @ " << std::ctime(&receive_time);
           ClientSession::RequestHandler handler =
               ClientSession::getHandler(req.getRequestType());
           if (handler) {
