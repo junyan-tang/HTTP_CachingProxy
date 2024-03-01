@@ -11,6 +11,8 @@
 
 namespace http = boost::beast::http;
 
+pthread_mutex_t cacheMutex = PTHREAD_MUTEX_INITIALIZER;
+
 static size_t session_id = 0;
 Cache cache(100);
 
@@ -84,7 +86,9 @@ void ClientSession::processGET(Request &req) {
       logFile << m_id << ": not cacheable because " << resp.isCacheable()
               << std::endl;
     } else {
+      pthread_mutex_lock(&cacheMutex);
       cache.addToCache(uri, resp);
+      pthread_mutex_unlock(&cacheMutex);
       if (cache.checkValidation(resp.getResponse())) {
         logFile << m_id << ": cached, but requires re-validation" << std::endl;
       } else if (resp.checkExpireTime() != "") {

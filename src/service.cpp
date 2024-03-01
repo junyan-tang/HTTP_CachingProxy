@@ -7,44 +7,44 @@
 #include <unistd.h>
 
 int main() {
-  pid_t pid = fork();
+  // pid_t pid = fork();
 
-  if (pid < 0) {
-    std::cerr << "Failed to fork process\n";
-    return 1;
-  }
+  // if (pid < 0) {
+  //   std::cerr << "Failed to fork process\n";
+  //   return 1;
+  // }
 
-  if (pid > 0) {
-    return 0;
-  }
+  // if (pid > 0) {
+  //   return 0;
+  // }
 
-  pid_t sid = setsid();
-  if (sid < 0) {
-    std::cerr << "Failed to create a new session\n";
-    return 1;
-  }
+  // pid_t sid = setsid();
+  // if (sid < 0) {
+  //   std::cerr << "Failed to create a new session\n";
+  //   return 1;
+  // }
 
-  pid = fork();
-  if (pid < 0) {
-    std::cerr << "Failed to fork process\n";
-    return 1;
-  }
+  // pid = fork();
+  // if (pid < 0) {
+  //   std::cerr << "Failed to fork process\n";
+  //   return 1;
+  // }
 
-  if (pid > 0) {
-    return 0;
-  }
+  // if (pid > 0) {
+  //   return 0;
+  // }
 
-  umask(0);
+  // umask(0);
 
-  if ((chdir("/")) < 0) {
-    std::cerr << "Failed to change directory\n";
-    return 1;
-  }
+  // if ((chdir("/")) < 0) {
+  //   std::cerr << "Failed to change directory\n";
+  //   return 1;
+  // }
 
-  std::cout << "Daemon started with pid " << getpid() << std::endl;
-  close(STDIN_FILENO);
-  close(STDOUT_FILENO);
-  close(STDERR_FILENO);
+  // std::cout << "Daemon started with pid " << getpid() << std::endl;
+  // close(STDIN_FILENO);
+  // close(STDOUT_FILENO);
+  // close(STDERR_FILENO);
 
   // Daemon-specific initialization goes here
   try {
