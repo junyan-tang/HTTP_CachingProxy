@@ -63,7 +63,7 @@ void ClientSession::processGET(Request &req) {
   else{
     logFile << session_id << ": Requesting " << req.getFirstLine() << " from " << req.getTargetHost() << std::endl;  
   }
-  ClientSession::processPOST(req);
+  ClientSession::requestFromServer(req);
   Response resp(m_response);
 
   if (resp.getStatusCode() == 200) {
@@ -83,11 +83,9 @@ void ClientSession::processGET(Request &req) {
   }
 }
 
-void ClientSession::processPOST(Request &req) {
-  std::cout << "Enter GET/POST:" << m_request << std::endl;
+void ClientSession::requestFromServer(Request &req) {
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
-  std::cout << "Host: " << host << " Port: " << port << std::endl;
 
   boost::asio::io_context &ioContext =
       static_cast<boost::asio::io_context &>(m_socket.get_executor().context());
@@ -112,7 +110,6 @@ void ClientSession::processPOST(Request &req) {
               m_target_socket, m_request,
               [this, self](boost::system::error_code ec, std::size_t length) {
                 if (!ec) {
-                  std::cout << "After connect" << m_request << std::endl;
                   http::async_read(m_target_socket, m_buffer_target, m_response,
                                    [this, self](boost::system::error_code ec,
                                                 std::size_t length) {
@@ -121,11 +118,10 @@ void ClientSession::processPOST(Request &req) {
                                      }
                                    });
                 } else {
-                  std::cout << "Post Request Send Error: " << ec.message()
+                  std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
                 }
               }
-
           );
         } else {
           // connect failed
@@ -133,6 +129,11 @@ void ClientSession::processPOST(Request &req) {
           sendResponse();
         }
       });
+}
+
+void ClientSession::processPOST(Request &req) {
+  logFile << session_id << ": Requesting " << req.getFirstLine() << " from " << req.getTargetHost() << std::endl;  
+  ClientSession::requestFromServer(req);
 }
 
 void ClientSession::processCONNECT(Request &req) {
@@ -158,8 +159,6 @@ void ClientSession::processCONNECT(Request &req) {
       m_target_socket, endpoints,
       [this, self](boost::system::error_code ec, const tcp::endpoint &) {
         if (!ec) {
-          // boost::asio::socket_base::keep_alive option(true);
-          // m_target_socket.set_option(option);
           // connect successful
           m_response.result(http::status::ok);
           m_response.set(http::field::connection, "keep-alive");
@@ -172,15 +171,11 @@ void ClientSession::processCONNECT(Request &req) {
           sendResponse();
         }
       });
+  logFile << session_id << ": Tunnel closed" << std::endl;
 }
 
 ClientSession::RequestHandler
 ClientSession::getHandler(const std::string_view &requestType) {
-  // assign it a unique id (ID), and print the ID, time received (TIME), IP
-  // address the request was received from (IPFROM) and the HTTP request line
-  // (REQUEST) of the request in the following format: ID: "REQUEST" from
-  // IPFROM
-  // @ TIME
   if (requestType == "GET") {
     return &ClientSession::processGET;
   } else if (requestType == "POST") {
@@ -188,9 +183,8 @@ ClientSession::getHandler(const std::string_view &requestType) {
   } else if (requestType == "CONNECT") {
     return &ClientSession::processCONNECT;
   } else {
-    // Handle unknown request type
-    // logFile << req.getID() << 
-    // ID: Responding "RESPONSE" receive a malformed request
+    //handle malformed type
+    logFile << session_id << ": Responding " << " receive a malformed request" << std::endl; 
     return nullptr;
   }
 }
@@ -210,10 +204,11 @@ void ClientSession::readRequest() {
       m_socket, m_buffer_client, m_request,
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
-          std::cout << "Client session " << m_id
-                    << " received a request:" << std::endl;
-          std::cout << m_request << std::endl;
           Request req(m_request);
+          std::string ip_from = m_socket.remote_endpoint().address().to_string();
+          auto receive_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+          logFile << session_id << ": \"" << req.getFirstLine() 
+                  << "\" from " << ip_from << " @ " << std::ctime(&receive_time);
           ClientSession::RequestHandler handler =
               ClientSession::getHandler(req.getRequestType());
           if (handler) {
@@ -231,14 +226,11 @@ void ClientSession::sendResponse() {
       m_socket, m_response,
       [this, self](boost::system::error_code ec, std::size_t length) {
         if (!ec) {
-          // Read the next request
-          std::cout << "Response sent" << std::endl;
-          std::cout << m_response << std::endl;
           if (!is_forwarding) {
             readRequest();
           }
         } else {
-          std::cout << "Response Send Error: " << ec.message() << std::endl;
+          std::cerr << "Response Send Error: " << ec.message() << std::endl;
         }
       });
 }

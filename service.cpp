@@ -1,5 +1,3 @@
-// #include "cache.hpp"
-// #include "log.hpp"
 #include "proxy.hpp"
 #include "request.hpp"
 

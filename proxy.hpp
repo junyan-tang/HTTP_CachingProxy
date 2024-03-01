@@ -35,6 +35,7 @@ private:
   void processPOST(Request &req);
   void processCONNECT(Request &req);
   void processMalformed();
+  void requestFromServer(Request &req);
   void startForwarding();
   void doForward(tcp::socket &source, tcp::socket &target,
                  boost::beast::flat_buffer &buffer);
