@@ -21,12 +21,15 @@ protected:
 
 public:
   Request(http::request<http::dynamic_body> &m_req)
-      : req(m_req),
-        requestType(req.method_string().data(), req.method_string().size()),
-        target(req.target().data(), req.target().size()), headers(req.base()),
-        version(req.version()) {}
+    : req(m_req),
+      requestType(req.method_string().data(), req.method_string().size()),
+      target(req.target().data(), req.target().size()), headers(req.base()),
+      version(req.version()) {}
+  int getVersion() { return version; }
   std::string_view getRequestType() { return requestType; }
   std::string_view getTarget() { return target; }
+  http::fields getHeaders() { return headers; }
+  http::request<http::string_body> &getRequest() { return req; }
   std::string getTargetHost() {
     std::string host = req["Host"].to_string();
     auto pos = host.find(':');
@@ -51,9 +54,6 @@ public:
       return port;
     }
   }
-  int getVersion() { return version; }
-  http::fields getHeaders() { return headers; }
-  http::request<http::string_body> getRequest() { return req; }
   std::string getFirstLine() {
     std::ostringstream ss;
     ss << requestType << " " << target << " HTTP/" << version / 10 << "."

@@ -1,6 +1,7 @@
 #ifndef __CACHE_HPP__
 #define __CACHE_HPP__
 #include "response.hpp"
+#include "request.hpp"
 #include <boost/beast/http.hpp>
 #include <chrono>
 #include <ctime>
@@ -23,8 +24,8 @@ public:
   void removeFromCache();
   bool isCacheFull();
   bool isInCache(std::string_view &uri);
-  bool isCacheUsable(std::string_view &uri, int reqID);
   bool checkValidation(http::response<http::string_body> res);
+  std::string isCacheUsable(std::string_view &uri, int reqID);
   http::response<http::string_body> getCachedPage(std::string_view &uri);
 };
 

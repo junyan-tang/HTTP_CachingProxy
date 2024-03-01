@@ -57,7 +57,7 @@ bool Cache::checkValidation(http::response<http::string_body> resp) {
   return false;
 }
 
-bool Cache::isCacheUsable(std::string_view &uri, int req_id) {
+std::string Cache::isCacheUsable(std::string_view &uri, int req_id) {
   if (!isInCache(uri)) {
     logFile << req_id << ": not in cache" << std::endl;
   } else {
@@ -67,14 +67,16 @@ bool Cache::isCacheUsable(std::string_view &uri, int req_id) {
     if (compareExpireTime(resp.getResponse(), expire_time)) {
       logFile << req_id << ": in cache, but expired at " << expire_time
               << std::endl;
+      return "expired";
     } else if (checkValidation(resp.getResponse())) {
       logFile << req_id << ": in cache, requires validation" << std::endl;
+      return "revalidation";
     } else {
       logFile << req_id << ": in cache, valid" << std::endl;
-      return true;
+      return "valid";
     }
   }
-  return false;
+  return "not in cache";
 }
 
 void Cache::removeFromCache() {
@@ -84,10 +86,12 @@ void Cache::removeFromCache() {
 }
 
 void Cache::addToCache(std::string_view &uri, Response &response) {
-  if (isCacheFull()) {
-    removeFromCache();
+  if(!isInCache(uri)){
+    if (isCacheFull()) {
+      removeFromCache();
+    }
+    cacheQueue.push(uri);
   }
-  cacheQueue.push(uri);
   cacheBase[uri] = response;
 }
 
@@ -109,3 +113,4 @@ http::response<http::string_body> Cache::getCachedPage(std::string_view &uri) {
   Response res = cacheBase[uri];
   return res.getResponse();
 }
+
