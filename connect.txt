@@ -1,5 +1,0 @@
-CONNECT alive.github.com:443 HTTP/1.1
-Host: alive.github.com:443
-Proxy-Connection: keep-alive
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
-

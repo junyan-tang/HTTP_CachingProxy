@@ -1,6 +1,0 @@
-GET http://secure.globalsign.com/cacert/gsrsaovsslca2018.crt HTTP/1.1
-Host: secure.globalsign.com
-Proxy-Connection: keep-alive
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36
-Accept-Encoding: gzip, deflate
-Accept-Language: zh-CN,zh;q=0.9
