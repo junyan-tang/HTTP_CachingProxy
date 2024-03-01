@@ -23,9 +23,9 @@ public:
   void removeFromCache();
   bool isCacheFull();
   bool isInCache(std::string_view &uri);
-  bool checkValidation(http::response<http::string_body> res);
+  bool checkValidation(http::response<http::dynamic_body> res);
   std::string isCacheUsable(std::string_view &uri, int reqID);
-  http::response<http::string_body> getCachedPage(std::string_view &uri);
+  http::response<http::dynamic_body> getCachedPage(std::string_view &uri);
 };
 
 #endif

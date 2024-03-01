@@ -58,12 +58,12 @@ void ClientSession::startForwarding() {
 void ClientSession::processGET(Request &req) {
   std::string_view uri = req.getTarget();
   std::string cache_status = cache.isCacheUsable(uri, m_id);
-  http::request<http::string_body> req_body = req.getRequest();
+  http::request<http::dynamic_body> req_body = req.getRequest();
 
   if (cache_status == "valid") {
-    http::response<http::string_body> resp = cache.getCachedPage(uri);
+    http::response<http::dynamic_body> resp = cache.getCachedPage(uri);
   } else if(cache_status == "revalidation") {
-    http::response<http::string_body> resp = cache.getCachedPage(uri);
+    http::response<http::dynamic_body> resp = cache.getCachedPage(uri);
     std::string eTagValue = getETag(resp);
     std::string lastModified = getLastModified(resp);
     if(eTagValue != ""){

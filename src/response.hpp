@@ -12,7 +12,7 @@ namespace http = boost::beast::http;
 using namespace boost::asio;
 using boost::asio::ip::tcp;
 
-inline std::string getETag(http::response<http::string_body> res){
+inline std::string getETag(http::response<http::dynamic_body> res){
     auto etag = res.find(http::field::etag);
     if (etag == res.end()){
       return "";
@@ -21,7 +21,7 @@ inline std::string getETag(http::response<http::string_body> res){
     }
   }
 
-inline std::string getLastModified(http::response<http::string_body> res){
+inline std::string getLastModified(http::response<http::dynamic_body> res){
   auto last_modified = res.find(http::field::last_modified);
   if (last_modified == res.end()){
     return "";
@@ -32,22 +32,20 @@ inline std::string getLastModified(http::response<http::string_body> res){
 
 class Response {
 protected:
-  http::response<http::string_body> res;
+  http::response<http::dynamic_body> res;
   int status_code;
   int version;
   http::fields headers;
-  std::string body;
 
 public:
   Response(http::response<http::dynamic_body> &m_res)
       : res(m_res), status_code(res.result_int()), version(res.version()),
-        headers(res.base()), body(res.body()) {}
+        headers(res.base()) {}
   Response() {}
 
   int getStatusCode() { return status_code; }
   http::fields getHeaders() { return headers; }
-  std::string getBody() { return body; }
-  http::response<http::string_body> getResponse() { return res; }
+  http::response<http::dynamic_body> getResponse() { return res; }
   std::string checkExpireTime() {
     std::string expire_time;
     auto it = res.find(http::field::expires);

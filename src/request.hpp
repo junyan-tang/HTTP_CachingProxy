@@ -13,7 +13,7 @@ using boost::asio::ip::tcp;
 
 class Request {
 protected:
-  http::request<http::string_body> req;
+  http::request<http::dynamic_body> req;
   std::string_view requestType;
   std::string_view target;
   http::fields headers;
@@ -29,7 +29,7 @@ public:
   std::string_view getRequestType() { return requestType; }
   std::string_view getTarget() { return target; }
   http::fields getHeaders() { return headers; }
-  http::request<http::string_body> &getRequest() { return req; }
+  http::request<http::dynamic_body> &getRequest() { return req; }
   std::string getTargetHost() {
     std::string host = req["Host"].to_string();
     auto pos = host.find(':');

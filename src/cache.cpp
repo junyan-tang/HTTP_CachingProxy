@@ -1,7 +1,7 @@
 #include "cache.hpp"
 #include "log.hpp"
 
-bool compareExpireTime(http::response<http::string_body> resp,
+bool compareExpireTime(http::response<http::dynamic_body> resp,
                        std::string expire_time) {
   int max_age = -1;
   if (resp.find("Cache-Control") != resp.end()) {
@@ -44,7 +44,7 @@ bool compareExpireTime(http::response<http::string_body> resp,
   return false;
 }
 
-bool Cache::checkValidation(http::response<http::string_body> resp) {
+bool Cache::checkValidation(http::response<http::dynamic_body> resp) {
   if (resp.find(http::field::cache_control) != resp.end()) {
     std::string cache_control = resp.at(http::field::cache_control).to_string();
     if (cache_control.find("no-cache") != std::string::npos) {
@@ -109,7 +109,7 @@ bool Cache::isInCache(std::string_view &uri) {
   return true;
 }
 
-http::response<http::string_body> Cache::getCachedPage(std::string_view &uri) {
+http::response<http::dynamic_body> Cache::getCachedPage(std::string_view &uri) {
   Response res = cacheBase[uri];
   return res.getResponse();
 }
