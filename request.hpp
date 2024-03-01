@@ -17,7 +17,6 @@ protected:
   std::string_view requestType;
   std::string_view target;
   http::fields headers;
-  int id;
   int version;
 
 public:
@@ -53,9 +52,13 @@ public:
     }
   }
   int getVersion() { return version; }
-  int getID() { return id; }
   http::fields getHeaders() { return headers; }
   http::request<http::string_body> getRequest() { return req; }
+  std::string getFirstLine(){
+    std::ostringstream ss;
+    ss << requestType << " " << target << " HTTP/" << version / 10 << "." << version % 10;
+    return ss.str();
+  }
 };
 
 #endif

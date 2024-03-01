@@ -8,7 +8,7 @@ CXXFLAGS = -Wall -std=c++17 -MMD -MP -g
 LIBS = -lboost_system -lpthread
 
 # Source files
-SRCS = service.cpp proxy.cpp # cache.cpp
+SRCS = service.cpp proxy.cpp cache.cpp
 
 # Object files
 OBJS = $(SRCS:.cpp=.o)

@@ -51,6 +51,7 @@ bool Cache::checkValidation(http::response<http::string_body> resp){
           return true;
         }
     }
+    return false;
 }
 
 bool Cache::isCacheUsable(std::string_view &uri, int req_id){
@@ -58,8 +59,9 @@ bool Cache::isCacheUsable(std::string_view &uri, int req_id){
     logFile << req_id << ": not in cache" << std::endl;
   }
   else{
-    Response resp = cacheBase[uri];
-    std::string expire_time = resp.checkExpireTime(resp.getResponse());
+    auto it = cacheBase.find(uri);
+    Response &resp = it->second;
+    std::string expire_time = resp.checkExpireTime();
     if(compareExpireTime(resp.getResponse(), expire_time)){
       logFile << req_id << ": in cache, but expired at " << expire_time << std::endl;
     }
