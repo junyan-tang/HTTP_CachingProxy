@@ -2,7 +2,7 @@
 CXX = g++
 
 # Compiler flags
-CXXFLAGS = -Wall -std=c++17 -MMD -MP -g
+CXXFLAGS = -Wall -std=c++17 -MMD -MP
 
 # Boost libraries
 LIBS = -lboost_system -lpthread

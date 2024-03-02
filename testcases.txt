@@ -1,0 +1,206 @@
+1. Method test: CONNECT
+    https://www.google.com
+
+Results:
+1: "CONNECT www.google.com:443 HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:53:17 2024
+1: Requesting CONNECT www.google.com:443 HTTP/1.1 from www.google.com
+1: Responding "HTTP/1.1 200 OK"
+1: Tunnel closed
+5: "CONNECT waa-pa.clients6.google.com:443 HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:53:17 2024
+5: Requesting CONNECT waa-pa.clients6.google.com:443 HTTP/1.1 from waa-pa.clients6.google.com
+5: Responding "HTTP/1.1 200 OK"
+5: Tunnel closed
+6: "CONNECT accounts.google.com:443 HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:53:17 2024
+6: Requesting CONNECT accounts.google.com:443 HTTP/1.1 from accounts.google.com
+6: Responding "HTTP/1.1 200 OK"
+6: Tunnel closed
+8: "CONNECT waa-pa.googleapis.com:443 HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:53:20 2024
+8: Requesting CONNECT waa-pa.googleapis.com:443 HTTP/1.1 from waa-pa.googleapis.com
+8: Responding "HTTP/1.1 200 OK"
+8: Tunnel closed
+9: "CONNECT ogs.google.com:443 HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:53:22 2024
+9: Requesting CONNECT ogs.google.com:443 HTTP/1.1 from ogs.google.com
+9: Responding "HTTP/1.1 200 OK"
+9: Tunnel closed
+
+2. Method test: GET
+    http://httpbin.org/forms/post
+
+Results:
+7: "GET http://httpbin.org/forms/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:57:30 2024
+7: not in cache
+7: Requesting GET http://httpbin.org/forms/post HTTP/1.1 from httpbin.org
+7: Received "HTTP/1.1 200 OK" from httpbin.org
+7: not cacheable because This page has no ETag and Last-Modified field.
+7: Responding "HTTP/1.1 200 OK"
+7: "GET http://httpbin.org/forms/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:57:31 2024
+7: not in cache
+7: Requesting GET http://httpbin.org/forms/post HTTP/1.1 from httpbin.org
+7: Received "HTTP/1.1 200 OK" from httpbin.org
+7: not cacheable because This page has no ETag and Last-Modified field.
+7: Responding "HTTP/1.1 200 OK"
+8: "GET http://httpbin.org/forms/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:57:31 2024
+8: not in cache
+8: Requesting GET http://httpbin.org/forms/post HTTP/1.1 from httpbin.org
+8: Received "HTTP/1.1 200 OK" from httpbin.org
+8: not cacheable because This page has no ETag and Last-Modified field.
+8: Responding "HTTP/1.1 200 OK"
+8: "GET http://httpbin.org/forms/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:57:32 2024
+8: not in cache
+8: Requesting GET http://httpbin.org/forms/post HTTP/1.1 from httpbin.org
+8: Received "HTTP/1.1 200 OK" from httpbin.org
+8: not cacheable because This page has no ETag and Last-Modified field.
+8: Responding "HTTP/1.1 200 OK"
+9: "GET http://httpbin.org/forms/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:57:32 2024
+9: not in cache
+9: Requesting GET http://httpbin.org/forms/post HTTP/1.1 from httpbin.org
+9: Received "HTTP/1.1 200 OK" from httpbin.org
+9: not cacheable because This page has no ETag and Last-Modified field.
+9: Responding "HTTP/1.1 200 OK"
+9: "GET http://httpbin.org/forms/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 16:57:33 2024
+9: not in cache
+9: Requesting GET http://httpbin.org/forms/post HTTP/1.1 from httpbin.org
+9: Received "HTTP/1.1 200 OK" from httpbin.org
+9: not cacheable because This page has no ETag and Last-Modified field.
+9: Responding "HTTP/1.1 200 OK"
+
+3. Method test: POST
+    http://httpbin.org/forms/post
+
+Results:
+1: "POST http://httpbin.org/post HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:00:34 2024
+1: Requesting POST http://httpbin.org/post HTTP/1.1 from httpbin.org
+1: Received "HTTP/1.1 200 OK" from httpbin.org
+1: Responding "HTTP/1.1 200 OK"
+
+4. Mechanism test: in cache, valid
+    http://info.cern.ch/hypertext/WWW/TheProject.html
+
+Results:
+6: "GET http://info.cern.ch/favicon.ico HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:45:25 2024
+6: not in cache
+6: Requesting GET http://info.cern.ch/favicon.ico HTTP/1.1 from info.cern.ch
+6: Received "HTTP/1.1 200 OK" from info.cern.ch
+6: Responding "HTTP/1.1 200 OK"
+7: "GET http://info.cern.ch/hypertext/WWW/TheProject.html HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:45:26 2024
+7: in cache, valid
+7: Responding "HTTP/1.1 200 OK"
+8: "GET http://info.cern.ch/hypertext/WWW/TheProject.html HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:45:26 2024
+8: in cache, valid
+8: Responding "HTTP/1.1 200 OK"
+9: "GET http://info.cern.ch/hypertext/WWW/TheProject.html HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:45:26 2024
+9: in cache, valid
+9: Responding "HTTP/1.1 200 OK"
+10: "GET http://info.cern.ch/hypertext/WWW/TheProject.html HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:45:26 2024
+10: in cache, valid
+10: Responding "HTTP/1.1 200 OK"
+
+5. Mechanism test: chunked response
+    http://www.httpwatch.com/httpgallery/chunked/chunkedimage.aspx
+
+Results:
+0: "GET http://www.httpwatch.com/httpgallery/chunked/chunkedimage.aspx HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 17:48:33 2024
+0: not in cache
+0: Requesting GET http://www.httpwatch.com/httpgallery/chunked/chunkedimage.aspx HTTP/1.1 from www.httpwatch.com
+0: Received "HTTP/1.1 200 OK" from www.httpwatch.com
+0: not cacheable because This page can't be cached.
+0: Responding "HTTP/1.1 200 OK"
+
+6. Mechanism test: no-store
+    flask testing
+
+Results:
+10: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:01:27 2024
+10: not in cache
+10: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+10: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+10: not cacheable because This page can't be cached.
+10: Responding "HTTP/1.1 200 OK"
+
+7. Mechanism test: no-cache
+    flask testing
+
+Results:
+3: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:07:51 2024
+3: not in cache
+3: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+3: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+3: cached, but requires re-validation
+3: Responding "HTTP/1.1 200 OK"
+4: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:07:51 2024
+4: in cache, but expired at Sat, 02 Mar 2024 23:08:51 GMT
+4: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+4: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+4: cached, but requires re-validation
+
+8. Mechanism test: max-age = 15, must-revalidate
+    flask testing
+
+Results:
+7: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:11:58 2024
+7: not in cache
+7: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+7: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+7: cached, but requires re-validation
+7: Responding "HTTP/1.1 200 OK"
+8: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:11:58 2024
+8: in cache, but expired at 
+8: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+8: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+8: cached, but requires re-validation
+8: Responding "HTTP/1.1 200 OK"
+
+9. Mechanism test: max-age = 15, private
+    flask testing
+
+Results:
+2: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:14:30 2024
+2: not in cache
+2: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+2: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+2: not cacheable because This page is private.
+2: Responding "HTTP/1.1 200 OK"
+3: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:14:30 2024
+3: not in cache
+3: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+3: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+3: not cacheable because This page is private.
+3: Responding "HTTP/1.1 200 OK"
+
+10. Mechanism test: no eTag and last Modified
+    flask testing
+
+Results:
+6: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:17:29 2024
+6: not in cache
+6: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+6: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+6: not cacheable because This page has no ETag and Last-Modified field.
+6: Responding "HTTP/1.1 200 OK"
+7: "GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:17:30 2024
+7: not in cache
+7: Requesting GET http://vcm-36099.vm.duke.edu:5000/ HTTP/1.1 from vcm-36099.vm.duke.edu
+7: Received "HTTP/1.1 200 OK" from vcm-36099.vm.duke.edu
+7: not cacheable because This page has no ETag and Last-Modified field.
+7: Responding "HTTP/1.1 200 OK"
+
+11. Status test: 400
+    http://run.mocky.io/v3/cd79f3cc-15f9-4b04-b767-ee2d64a25d3d
+
+Results:
+9: "GET http://run.mocky.io/v3/cd79f3cc-15f9-4b04-b767-ee2d64a25d3d HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:27:23 2024
+9: not in cache
+9: Requesting GET http://run.mocky.io/v3/cd79f3cc-15f9-4b04-b767-ee2d64a25d3d HTTP/1.1 from run.mocky.io
+9: Received "HTTP/1.1 400 Bad Request" from run.mocky.io
+9: Responding "HTTP/1.1 400 Bad Request"
+
+12. Status test: 502
+    http://run.mocky.io/v3/22c07d6c-4d1c-4b00-9154-9abb16ac5b24
+
+Results:
+19: "GET http://run.mocky.io/v3/22c07d6c-4d1c-4b00-9154-9abb16ac5b24 HTTP/1.1" from 10.197.209.22 @ Sat Mar  2 18:24:12 2024
+19: not in cache
+19: Requesting GET http://run.mocky.io/v3/22c07d6c-4d1c-4b00-9154-9abb16ac5b24 HTTP/1.1 from run.mocky.io
+19: Received "HTTP/1.1 502 Bad Gateway" from run.mocky.io
+19: Responding "HTTP/1.1 502 Bad Gateway"
+

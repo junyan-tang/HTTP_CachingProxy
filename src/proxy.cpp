@@ -2,6 +2,7 @@
 #include "cache.hpp"
 #include "log.hpp"
 #include "request.hpp"
+#include "response.hpp"
 #include <boost/beast/http/read.hpp>
 #include <functional>
 #include <iostream>
@@ -72,6 +73,9 @@ void ClientSession::processGET(Request &req) {
 
   if (cache_status == "valid") {
     m_response = cache.getCachedPage(uri);
+    Response resp(m_response);
+    logFile << m_id << ": Responding \"" << resp.getFirstLine() << "\""
+            << std::endl;
     sendResponse();
     return;
   } else if (cache_status == "revalidation") {
@@ -113,8 +117,6 @@ void ClientSession::tryAddToCache(std::string_view uri) {
                 << std::endl;
       }
     }
-  } else if (respCode == 304) {
-    logFile << m_id << ": Not modified" << std::endl;
   }
 }
 
@@ -166,6 +168,9 @@ void ClientSession::requestFromServer(Request &req,
                           std::cerr << "Response Read Error: " << ec.message()
                                     << std::endl;
                           m_response.result(http::status::bad_gateway);
+                          Response resp(m_response);
+                          logFile << m_id << ": Responding \""
+                                  << resp.getFirstLine() << "\"" << std::endl;
                           sendResponse();
                         }
                       });
@@ -174,6 +179,9 @@ void ClientSession::requestFromServer(Request &req,
                   std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
                   m_response.result(http::status::bad_gateway);
+                  Response resp(m_response);
+                  logFile << m_id << ": Responding \"" << resp.getFirstLine()
+                          << "\"" << std::endl;
                   sendResponse();
                 }
               });
@@ -182,6 +190,9 @@ void ClientSession::requestFromServer(Request &req,
           writeErrorLog(ec.message());
           std::cerr << "Connect Error: " << ec.message() << std::endl;
           m_response.result(http::status::bad_gateway);
+          Response resp(m_response);
+          logFile << m_id << ": Responding \"" << resp.getFirstLine() << "\""
+                  << std::endl;
           sendResponse();
         }
       });
@@ -234,6 +245,9 @@ void ClientSession::processCONNECT(Request &req) {
           // connect failed
           writeErrorLog(ec.message());
           m_response.result(http::status::bad_gateway);
+          Response resp(m_response);
+          logFile << m_id << ": Responding \"" << resp.getFirstLine() << "\""
+                  << std::endl;
           sendResponse();
         }
       });
@@ -280,8 +294,9 @@ void ClientSession::readRequest() {
             (this->*handler)(req);
           } else {
             m_response.result(http::status::bad_request);
-            logFile << m_id << ": Responding "
-                    << " receive a malformed request" << std::endl;
+            Response resp(m_response);
+            logFile << m_id << ": Responding " << resp.getFirstLine()
+                    << std::endl;
             sendResponse();
           }
           // TODO: Handle unknown request type
