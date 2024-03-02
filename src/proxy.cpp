@@ -42,7 +42,7 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                             buffer); // Continue the forwarding loop
                 } else {
                   // Handle write error or close connection
-                  writeErrorLog(ec.message());
+                  // writeErrorLog(ec.message());
                   m_target_socket.close();
                   m_response.result(http::status::bad_gateway);
                   is_forwarding = false;
@@ -50,7 +50,7 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
               });
         } else {
           // Handle read error or close connection
-          writeErrorLog(ec.message());
+          // writeErrorLog(ec.message());
           m_target_socket.close();
           m_response.result(http::status::bad_gateway);
           is_forwarding = false;
@@ -162,7 +162,7 @@ void ClientSession::requestFromServer(Request &req,
                                   << resp.getFirstLine() << "\"" << std::endl;
                           sendResponse();
                         } else {
-                          writeErrorLog(ec.message());
+                          // writeErrorLog(ec.message());
                           std::cerr << "Response Read Error: " << ec.message()
                                     << std::endl;
                           m_response.result(http::status::bad_gateway);
@@ -170,7 +170,7 @@ void ClientSession::requestFromServer(Request &req,
                         }
                       });
                 } else {
-                  writeErrorLog(ec.message());
+                  // writeErrorLog(ec.message());
                   std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
                   m_response.result(http::status::bad_gateway);
