@@ -40,6 +40,7 @@ private:
   void startForwarding();
   void doForward(tcp::socket &source, tcp::socket &target,
                  boost::beast::flat_buffer &buffer);
+  void writeErrorLog(const std::string &message);
 
 public:
   explicit ClientSession(tcp::socket socket);

@@ -6,7 +6,7 @@ services:
     command: bash -c "./run.sh"
     volumes:
       - type: bind
-        source: ./src/logs
+        source: ./logs
         target: /var/log/erss
     ports:
       - "12345:12345"

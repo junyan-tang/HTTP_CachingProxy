@@ -18,6 +18,10 @@ pthread_mutex_t cacheMutex = PTHREAD_MUTEX_INITIALIZER;
 static size_t session_id = 0;
 Cache cache(100);
 
+void ClientSession::writeErrorLog(const std::string &msg) {
+  logFile << m_id << ": ERROR " << msg << std::endl;
+}
+
 void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                               boost::beast::flat_buffer &buffer) {
   auto self(shared_from_this());
@@ -38,6 +42,7 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                             buffer); // Continue the forwarding loop
                 } else {
                   // Handle write error or close connection
+                  writeErrorLog(ec.message());
                   m_target_socket.close();
                   m_response.result(http::status::bad_gateway);
                   is_forwarding = false;
@@ -45,6 +50,7 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
               });
         } else {
           // Handle read error or close connection
+          writeErrorLog(ec.message());
           m_target_socket.close();
           m_response.result(http::status::bad_gateway);
           is_forwarding = false;
@@ -135,27 +141,28 @@ void ClientSession::requestFromServer(Request &req,
   boost::asio::async_connect(
       m_target_socket, endpoints,
       [this, self, host, callback](boost::system::error_code ec,
-                             const tcp::endpoint &) {
+                                   const tcp::endpoint &) {
         if (!ec) {
           http::async_write(
               m_target_socket, m_request,
               [this, self, host, callback](boost::system::error_code ec,
-                                     std::size_t length) {
+                                           std::size_t length) {
                 if (!ec) {
                   http::async_read(
                       m_target_socket, m_buffer_target, m_response,
                       [this, self, host, callback](boost::system::error_code ec,
-                                             std::size_t length) {
+                                                   std::size_t length) {
                         if (!ec) {
                           Response resp(m_response);
                           logFile << m_id << ": Received \""
-                                  << resp.getFirstLine() << "\" from "
-                                  << host << std::endl;
+                                  << resp.getFirstLine() << "\" from " << host
+                                  << std::endl;
                           callback();
-                          logFile << m_id << ": Responding \"" 
+                          logFile << m_id << ": Responding \""
                                   << resp.getFirstLine() << "\"" << std::endl;
                           sendResponse();
                         } else {
+                          writeErrorLog(ec.message());
                           std::cerr << "Response Read Error: " << ec.message()
                                     << std::endl;
                           m_response.result(http::status::bad_gateway);
@@ -163,6 +170,7 @@ void ClientSession::requestFromServer(Request &req,
                         }
                       });
                 } else {
+                  writeErrorLog(ec.message());
                   std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
                   m_response.result(http::status::bad_gateway);
@@ -171,6 +179,7 @@ void ClientSession::requestFromServer(Request &req,
               });
         } else {
           // connect failed
+          writeErrorLog(ec.message());
           std::cerr << "Connect Error: " << ec.message() << std::endl;
           m_response.result(http::status::bad_gateway);
           sendResponse();
@@ -186,7 +195,7 @@ void ClientSession::processPOST(Request &req) {
 
 void ClientSession::processCONNECT(Request &req) {
   logFile << m_id << ": Requesting " << req.getFirstLine() << " from "
-            << req.getTargetHost() << std::endl;
+          << req.getTargetHost() << std::endl;
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
 
@@ -214,15 +223,16 @@ void ClientSession::processCONNECT(Request &req) {
           m_response.set(http::field::connection, "keep-alive");
           is_forwarding = true;
           Response resp(m_response);
-          logFile << m_id << ": Received \""
-                  << resp.getFirstLine() << "\" from "
-                  << host << std::endl;
-          logFile << m_id << ": Responding \"" 
-                  << resp.getFirstLine() << "\"" << std::endl;
+          // logFile << m_id << ": Received \""
+          //         << resp.getFirstLine() << "\" from "
+          //         << host << std::endl;
+          logFile << m_id << ": Responding \"" << resp.getFirstLine() << "\""
+                  << std::endl;
           sendResponse();
           startForwarding();
         } else {
           // connect failed
+          writeErrorLog(ec.message());
           m_response.result(http::status::bad_gateway);
           sendResponse();
         }
@@ -275,6 +285,9 @@ void ClientSession::readRequest() {
             sendResponse();
           }
           // TODO: Handle unknown request type
+        } else {
+          writeErrorLog(ec.message());
+          std::cerr << "Request Read Error: " << ec.message() << std::endl;
         }
       });
 }
@@ -290,6 +303,7 @@ void ClientSession::sendResponse() {
             readRequest();
           }
         } else {
+          writeErrorLog(ec.message());
           std::cerr << "Response Send Error: " << ec.message() << std::endl;
         }
       });
