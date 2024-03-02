@@ -39,12 +39,14 @@ void ClientSession::doForward(tcp::socket &source, tcp::socket &target,
                 } else {
                   // Handle write error or close connection
                   m_target_socket.close();
+                  m_response.result(http::status::bad_gateway);
                   is_forwarding = false;
                 }
               });
         } else {
           // Handle read error or close connection
           m_target_socket.close();
+          m_response.result(http::status::bad_gateway);
           is_forwarding = false;
         }
       });
@@ -87,9 +89,7 @@ void ClientSession::processGET(Request &req) {
 }
 
 void ClientSession::tryAddToCache(std::string_view uri) {
-  std::cout << "RESPONSE2: " << m_response << std::endl;
   Response resp(m_response);
-  std::cout << "RESPONSE3: " << resp.getResponse() << std::endl;
   int respCode = resp.getStatusCode();
 
   if (respCode == 200) {
@@ -149,15 +149,23 @@ void ClientSession::requestFromServer(Request &req,
                         if (!ec) {
                           callback();
                           sendResponse();
+                        } else {
+                          std::cerr << "Response Read Error: " << ec.message()
+                                    << std::endl;
+                          m_response.result(http::status::bad_gateway);
+                          sendResponse();
                         }
                       });
                 } else {
                   std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
+                  m_response.result(http::status::bad_gateway);
+                  sendResponse();
                 }
               });
         } else {
           // connect failed
+          std::cerr << "Connect Error: " << ec.message() << std::endl;
           m_response.result(http::status::bad_gateway);
           sendResponse();
         }
