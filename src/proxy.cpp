@@ -3,7 +3,9 @@
 #include "log.hpp"
 #include "request.hpp"
 #include <boost/beast/http/read.hpp>
+#include <functional>
 #include <iostream>
+#include <string_view>
 
 // The basic implementation of proxy server and client session referenced from
 // the examples from asio section in official boost documentation
@@ -61,24 +63,33 @@ void ClientSession::processGET(Request &req) {
   http::request<http::dynamic_body> req_body = req.getRequest();
 
   if (cache_status == "valid") {
-    http::response<http::dynamic_body> resp = cache.getCachedPage(uri);
-  } else if(cache_status == "revalidation") {
+    m_response = cache.getCachedPage(uri);
+    sendResponse();
+    return;
+  } else if (cache_status == "revalidation") {
     http::response<http::dynamic_body> resp = cache.getCachedPage(uri);
     std::string eTagValue = getETag(resp);
     std::string lastModified = getLastModified(resp);
-    if(eTagValue != ""){
+    if (eTagValue != "") {
       req_body.set(http::field::if_none_match, eTagValue);
     }
-    if(lastModified != ""){
+    if (lastModified != "") {
       req_body.set(http::field::if_modified_since, lastModified);
     }
-    ClientSession::requestFromServer(req);
+    ClientSession::requestFromServer(req,
+                                     [this, uri]() { tryAddToCache(uri); });
   } else {
     logFile << m_id << ": Requesting " << req.getFirstLine() << " from "
             << req.getTargetHost() << std::endl;
-    ClientSession::requestFromServer(req);
+    ClientSession::requestFromServer(req,
+                                     [this, uri]() { tryAddToCache(uri); });
   }
+}
+
+void ClientSession::tryAddToCache(std::string_view uri) {
+  std::cout << "RESPONSE2: " << m_response << std::endl;
   Response resp(m_response);
+  std::cout << "RESPONSE3: " << resp.getResponse() << std::endl;
   int respCode = resp.getStatusCode();
 
   if (respCode == 200) {
@@ -96,12 +107,13 @@ void ClientSession::processGET(Request &req) {
                 << std::endl;
       }
     }
-  } else if(respCode == 304){
+  } else if (respCode == 304) {
     logFile << m_id << ": Not modified" << std::endl;
   }
 }
 
-void ClientSession::requestFromServer(Request &req) {
+void ClientSession::requestFromServer(Request &req,
+                                      std::function<void()> callback) {
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
 
@@ -122,19 +134,23 @@ void ClientSession::requestFromServer(Request &req) {
 
   boost::asio::async_connect(
       m_target_socket, endpoints,
-      [this, self](boost::system::error_code ec, const tcp::endpoint &) {
+      [this, self, callback](boost::system::error_code ec,
+                             const tcp::endpoint &) {
         if (!ec) {
           http::async_write(
               m_target_socket, m_request,
-              [this, self](boost::system::error_code ec, std::size_t length) {
+              [this, self, callback](boost::system::error_code ec,
+                                     std::size_t length) {
                 if (!ec) {
-                  http::async_read(m_target_socket, m_buffer_target, m_response,
-                                   [this, self](boost::system::error_code ec,
-                                                std::size_t length) {
-                                     if (!ec) {
-                                       sendResponse();
-                                     }
-                                   });
+                  http::async_read(
+                      m_target_socket, m_buffer_target, m_response,
+                      [this, self, callback](boost::system::error_code ec,
+                                             std::size_t length) {
+                        if (!ec) {
+                          callback();
+                          sendResponse();
+                        }
+                      });
                 } else {
                   std::cerr << "POST/GET Request Send Error: " << ec.message()
                             << std::endl;
@@ -151,7 +167,7 @@ void ClientSession::requestFromServer(Request &req) {
 void ClientSession::processPOST(Request &req) {
   logFile << m_id << ": Requesting " << req.getFirstLine() << " from "
           << req.getTargetHost() << std::endl;
-  ClientSession::requestFromServer(req);
+  ClientSession::requestFromServer(req, []() {});
 }
 
 void ClientSession::processCONNECT(Request &req) {

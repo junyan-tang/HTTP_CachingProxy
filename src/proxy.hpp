@@ -35,7 +35,8 @@ private:
   void processPOST(Request &req);
   void processCONNECT(Request &req);
   void processMalformed();
-  void requestFromServer(Request &req);
+  void requestFromServer(Request &req, std::function<void()> callback);
+  void tryAddToCache(std::string_view uri);
   void startForwarding();
   void doForward(tcp::socket &source, tcp::socket &target,
                  boost::beast::flat_buffer &buffer);

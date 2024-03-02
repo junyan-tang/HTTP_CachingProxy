@@ -28,6 +28,9 @@ $(EXEC): $(OBJS)
 	$(CXX) $(CXXFLAGS) -c $<  -o $@
 
 clean:
-	$(RM) $(OBJS) $(EXEC) $(DEPS)
+	$(RM) $(OBJS) $(EXEC) $(DEPS) log.txt
+
+cleanlog:
+	$(RM) log.txt
 
 -include $(DEPS)
