@@ -79,7 +79,7 @@ public:
         return "This page is private.";
       }
     }
-    if(getETag(res) != "" && getLastModified(res) != ""){
+    if(getETag(res) == "" && getLastModified(res) == ""){
       return "This page has no ETag and Last-Modified field.";
     }
     return "";

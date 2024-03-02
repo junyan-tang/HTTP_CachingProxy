@@ -148,10 +148,12 @@ void ClientSession::requestFromServer(Request &req,
                                              std::size_t length) {
                         if (!ec) {
                           Response resp(m_response);
-                          logFile << m_id << ": Received "
-                                  << resp.getFirstLine() << " from "
+                          logFile << m_id << ": Received \""
+                                  << resp.getFirstLine() << "\" from "
                                   << host << std::endl;
                           callback();
+                          logFile << m_id << ": Responding \"" 
+                                  << resp.getFirstLine() << "\"" << std::endl;
                           sendResponse();
                         } else {
                           std::cerr << "Response Read Error: " << ec.message()
@@ -183,6 +185,8 @@ void ClientSession::processPOST(Request &req) {
 }
 
 void ClientSession::processCONNECT(Request &req) {
+  logFile << m_id << ": Requesting " << req.getFirstLine() << " from "
+            << req.getTargetHost() << std::endl;
   std::string host = req.getTargetHost();
   std::string port = req.getTargetPort();
 
@@ -203,12 +207,18 @@ void ClientSession::processCONNECT(Request &req) {
   auto self(shared_from_this());
   boost::asio::async_connect(
       m_target_socket, endpoints,
-      [this, self](boost::system::error_code ec, const tcp::endpoint &) {
+      [this, self, host](boost::system::error_code ec, const tcp::endpoint &) {
         if (!ec) {
           // connect successful
           m_response.result(http::status::ok);
           m_response.set(http::field::connection, "keep-alive");
           is_forwarding = true;
+          Response resp(m_response);
+          logFile << m_id << ": Received \""
+                  << resp.getFirstLine() << "\" from "
+                  << host << std::endl;
+          logFile << m_id << ": Responding \"" 
+                  << resp.getFirstLine() << "\"" << std::endl;
           sendResponse();
           startForwarding();
         } else {
