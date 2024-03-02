@@ -286,7 +286,7 @@ void ClientSession::readRequest() {
           }
           // TODO: Handle unknown request type
         } else {
-          writeErrorLog(ec.message());
+          // writeErrorLog(ec.message());
           std::cerr << "Request Read Error: " << ec.message() << std::endl;
         }
       });
@@ -303,7 +303,7 @@ void ClientSession::sendResponse() {
             readRequest();
           }
         } else {
-          writeErrorLog(ec.message());
+          // writeErrorLog(ec.message());
           std::cerr << "Response Send Error: " << ec.message() << std::endl;
         }
       });
