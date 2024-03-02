@@ -134,19 +134,23 @@ void ClientSession::requestFromServer(Request &req,
 
   boost::asio::async_connect(
       m_target_socket, endpoints,
-      [this, self, callback](boost::system::error_code ec,
+      [this, self, host, callback](boost::system::error_code ec,
                              const tcp::endpoint &) {
         if (!ec) {
           http::async_write(
               m_target_socket, m_request,
-              [this, self, callback](boost::system::error_code ec,
+              [this, self, host, callback](boost::system::error_code ec,
                                      std::size_t length) {
                 if (!ec) {
                   http::async_read(
                       m_target_socket, m_buffer_target, m_response,
-                      [this, self, callback](boost::system::error_code ec,
+                      [this, self, host, callback](boost::system::error_code ec,
                                              std::size_t length) {
                         if (!ec) {
+                          Response resp(m_response);
+                          logFile << m_id << ": Received "
+                                  << resp.getFirstLine() << " from "
+                                  << host << std::endl;
                           callback();
                           sendResponse();
                         } else {
